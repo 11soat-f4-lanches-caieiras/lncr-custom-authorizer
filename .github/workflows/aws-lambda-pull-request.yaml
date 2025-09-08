@@ -23,7 +23,7 @@ jobs:
       - name: Build with maven
         run: |
           cd aws-lambda/AuthorizerFunction
-          mvn clean package test
+          mvn clean package test -DLNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
