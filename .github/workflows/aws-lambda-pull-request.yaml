@@ -23,14 +23,13 @@ jobs:
       
       - name: Build with maven
         run: |
-          echo "LNCR_OAUTH_SECRET_KEY: " $LNCR_OAUTH_SECRET_KEY
           cd aws-lambda/AuthorizerFunction
-          mvn clean package test -DLNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
+          mvn clean package test
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
-      - name: Upload JAR Artefact
-        uses: actions/upload-artifact@v5
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: lncr-custom-authorizer
           path: target/*.jar
