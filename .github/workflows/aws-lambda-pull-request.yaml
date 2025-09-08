@@ -1,0 +1,33 @@
+name: Build lncr-customer authorizer AWS Lambda 
+on:
+  push:
+    branches:
+      - develop 
+  pull_request:
+    branches:
+      - master 
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        use: actions/checkout@v4
+
+      - name: Setup Java 21
+        use: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21  
+      
+      - name: Build with maven
+        run: mvn clean package tests
+          env:
+            LNCR_OAUTH_SECRET_KEY=${{secrets.LNCR_OAUTH_SECRET_KEY}}
+      
+      - name: Upload JAR Artefact
+        uses: actions/upload-artefact
+        with:
+          name: lncr-custom-authorizer
+          path: target/*.jar
