@@ -21,7 +21,9 @@ jobs:
           java-version: 21  
       
       - name: Build with maven
-        run: mvn clean package tests
+        run: |
+          cd lncr-custom-authorizer/aws-lambda/AuthorizerFunction
+          mvn clean package tests
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
