@@ -7,7 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 public class TokenDecoderUtils {
 
     private static <T> T getClaimValue(String claim, String token, Class<T> tClass) {
-        String oauthSecretKey = System.getenv("OAUTH_SECRET_KEY");
+        String oauthSecretKey = System.getenv("LNCR_OAUTH_SECRET_KEY");
         DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(oauthSecretKey)).build().verify(token);
         return decodedJWT.getClaim(claim).as(tClass);
     }

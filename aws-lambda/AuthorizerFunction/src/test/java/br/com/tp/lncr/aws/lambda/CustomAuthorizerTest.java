@@ -133,7 +133,7 @@ public class CustomAuthorizerTest {
 
     private String createValidTestToken(String scope) {
         try {
-            String secretKey = System.getenv("OAUTH_SECRET_KEY");
+            String secretKey = System.getenv("LNCR_OAUTH_SECRET_KEY");
             if (secretKey == null || secretKey.trim().isEmpty()) {
                 secretKey = "mysecretkey";
             }
