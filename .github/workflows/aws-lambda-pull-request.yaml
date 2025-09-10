@@ -24,14 +24,14 @@ jobs:
       - name: Get artifactId from Maven POM
         id: get_artifactid
         run: |
-          ARTIFACT_ID=$(mvn -f aws-lambda/AuthorizerFunction/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.artifactId}' --non-recursive exec:exec)
+          ARTIFACT_ID=$(mvn -f aws-lambda/CustomAuthorizer/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.artifactId}' --non-recursive exec:exec)
           echo "ARTIFACT_ID=$ARTIFACT_ID"
           echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
 
       - name: Get version from Maven POM
         id: get_version
         run: |
-          VERSION=$(mvn -f aws-lambda/AuthorizerFunction/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          VERSION=$(mvn -f aws-lambda/CustomAuthorizer/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
           echo "VERSION=$VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
