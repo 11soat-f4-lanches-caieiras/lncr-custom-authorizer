@@ -19,7 +19,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-          cache: 'sam-cli'
+          cache: 'maven'
 
       - name: Get artifactId from Maven POM
         id: get_artifactid
