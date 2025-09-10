@@ -45,11 +45,14 @@ jobs:
       - name: Install AWS SAM CLI # Instala o AWS SAM CLI
         run: |
           pip install aws-sam-cli
+        with:
+          cache: 'sam-cli'
 
       - name: SAM Build # Build da aplicacao Lambda usando SAM
         run: |
-          cd aws-lambda/AuthorizerFunction
-          sam build --use-container --template template.yaml --parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
+          sam build --use-container \
+          --template template.yaml \
+          --parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
           IMAGE_NAME: ${{ steps.get_artifactid.outputs.ARTIFACT_ID }}:${{ steps.get_version.outputs.VERSION }}-${{ steps.get_hash.outputs.HASH }}
           IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}-${{ steps.get_hash.outputs.HASH }}
