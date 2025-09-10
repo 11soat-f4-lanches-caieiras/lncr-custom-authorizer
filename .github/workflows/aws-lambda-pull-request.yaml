@@ -50,6 +50,7 @@ jobs:
         run: |
           echo ${IMAGE_NAME}
           echo ${IMAGE_TAG}
+          export SAM_CLI_TELEMETRY=0
           sam build --debug --use-container --template aws-lambda/template.yaml
         #--parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
