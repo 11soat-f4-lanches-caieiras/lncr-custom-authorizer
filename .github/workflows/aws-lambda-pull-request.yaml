@@ -48,6 +48,7 @@ jobs:
 
       - name: SAM Build # Build da aplicacao Lambda usando SAM
         run: |
+          export SAM_CLI_TELEMETRY=0
           sam build --debug --use-container --template aws-lambda/template.yaml --parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
           IMAGE_NAME: ${ARTIFACT_ID}:${VERSION}-${HASH}
