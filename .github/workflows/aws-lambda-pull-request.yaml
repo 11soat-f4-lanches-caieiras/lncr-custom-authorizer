@@ -19,7 +19,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-          cache: 'maven'
+          cache: 'sam-cli'
 
       - name: Get artifactId from Maven POM
         id: get_artifactid
@@ -45,8 +45,6 @@ jobs:
       - name: Install AWS SAM CLI # Instala o AWS SAM CLI
         run: |
           pip install aws-sam-cli
-        with:
-          cache: 'sam-cli'
 
       - name: SAM Build # Build da aplicacao Lambda usando SAM
         run: |
