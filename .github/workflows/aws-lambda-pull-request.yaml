@@ -9,7 +9,7 @@ on:
   
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
