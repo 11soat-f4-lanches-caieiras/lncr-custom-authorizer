@@ -20,16 +20,37 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'maven'
-      
-      - name: Build with maven
+
+      - name: Get artifactId from Maven POM
+        id: get_artifactid
+        run: |
+          ARTIFACT_ID=$(mvn -f aws-lambda/AuthorizerFunction/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.artifactId}' --non-recursive exec:exec)
+          echo "ARTIFACT_ID=$ARTIFACT_ID"
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+
+      - name: Get version from Maven POM
+        id: get_version
+        run: |
+          VERSION=$(mvn -f aws-lambda/AuthorizerFunction/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Get short hash from commit
+        id: get_hash
+        run: |
+          HASH=$(git rev-parse --short HEAD)
+          echo "HASH=$HASH"
+          echo "HASH=$HASH" >> $GITHUB_ENV
+
+      - name: Install AWS SAM CLI # Instala o AWS SAM CLI
+        run: |
+          pip install aws-sam-cli
+
+      - name: SAM Build # Build da aplicacao Lambda usando SAM
         run: |
           cd aws-lambda/AuthorizerFunction
-          mvn clean package test
+          sam build --use-container --template template.yaml --parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
+          IMAGE_NAME: ${{ steps.get_artifactid.outputs.ARTIFACT_ID }}:${{ steps.get_version.outputs.VERSION }}-${{ steps.get_hash.outputs.HASH }}
+          IMAGE_TAG: ${{ steps.get_version.outputs.VERSION }}-${{ steps.get_hash.outputs.HASH }}
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-
-      - name: Upload JAR Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lncr-custom-authorizer
-          path: target/*.jar
