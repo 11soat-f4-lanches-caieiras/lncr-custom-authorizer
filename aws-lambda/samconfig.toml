@@ -3,8 +3,8 @@
 version = 0.1
 
 [default.deploy.parameters]
-stack_name = 'lncr-customer-authorizer-stack'
-s3_prefix = 'lncr-customer-authorizer'
+stack_name = 'lncr-custom-authorizer-stack'
+s3_prefix = 'lncr-custom-authorizer'
 confirm_changeset = true
 disable_rollback = true
 region = "us-east-1"
