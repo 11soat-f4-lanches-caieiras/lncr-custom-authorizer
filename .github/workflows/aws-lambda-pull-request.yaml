@@ -21,39 +21,25 @@ jobs:
           java-version: 21
           cache: 'maven'
 
-      - name: Get artifactId from Maven POM
-        id: get_artifactid
-        run: |
-          ARTIFACT_ID=$(mvn -f aws-lambda/CustomAuthorizer/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.artifactId}' --non-recursive exec:exec)
-          echo "ARTIFACT_ID=$ARTIFACT_ID"
-          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
-
-      - name: Get version from Maven POM
-        id: get_version
-        run: |
-          VERSION=$(mvn -f aws-lambda/CustomAuthorizer/pom.xml -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-          echo "VERSION=$VERSION"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Get short hash from commit
-        id: get_hash
-        run: |
-          HASH=$(git rev-parse --short HEAD)
-          echo "HASH=$HASH"
-          echo "HASH=$HASH" >> $GITHUB_ENV
-
       - name: Install AWS SAM CLI # Instala o AWS SAM CLI
         run: |
           pip install aws-sam-cli
 
       - name: SAM Build # Build da aplicacao Lambda usando SAM
         run: |
-          echo ${IMAGE_NAME}
-          echo ${IMAGE_TAG}
-          export SAM_CLI_TELEMETRY=0
           sam build --debug --template aws-lambda/template.yaml
         #--parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
-          IMAGE_NAME: $ARTIFACT_ID:$VERSION-$HASH
-          IMAGE_TAG: $VERSION-$HASH
+          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
+  deploy:
+    needs: build
+    runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: SAM Deploy # Deploy da aplicacao Lambda usando SAM
+        run: |
+          sam deploy --debug --template-file .aws-sam/build/template.yaml --stack-name lncr-customer-authorizer --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
+        env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
