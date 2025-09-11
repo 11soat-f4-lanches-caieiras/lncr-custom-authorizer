@@ -37,6 +37,7 @@ jobs:
           pwd
           ls -ltra
           ls -ltra aws-lambda
+          cat aws-lambda/samconfig.toml
           sam deploy --guided --debug --config-file aws-lambda/samconfig.toml --template-file .aws-sam/build/template.yaml --stack-name lncr-customer-authorizer --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
