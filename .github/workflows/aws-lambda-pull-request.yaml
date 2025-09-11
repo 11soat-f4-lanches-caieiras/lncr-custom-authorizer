@@ -34,6 +34,6 @@ jobs:
 
       - name: SAM Deploy # Deploy da aplicacao Lambda usando SAM
         run: |
-          sam deploy --debug --config-file $PWD/aws-lambda/samconfig.toml --template-file .aws-sam/build/template.yaml --no-fail-on-empty-changeset
+          sam deploy --debug --config-file $PWD/aws-lambda/samconfig.toml --template-file .aws-sam/build/template.yaml --no-confirm-changeset --no-fail-on-empty-changeset
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
