@@ -51,9 +51,9 @@ jobs:
           echo ${IMAGE_NAME}
           echo ${IMAGE_TAG}
           export SAM_CLI_TELEMETRY=0
-          sam build --debug --use-container --template aws-lambda/template.yaml
+          sam build --debug --use-container --mount_with=WRITE --template aws-lambda/template.yaml
         #--parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
-          IMAGE_NAME: ${ARTIFACT_ID}:${VERSION}-${HASH}
-          IMAGE_TAG: ${VERSION}-${HASH}
+          IMAGE_NAME: $ARTIFACT_ID:$VERSION-$HASH
+          IMAGE_TAG: $VERSION-$HASH
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
