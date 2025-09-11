@@ -21,12 +21,12 @@ Resources:
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           LNCR_OAUTH_SECRET_KEY: ${LNCR_OAUTH_SECRET_KEY}
-       Events:
-         CustomAuthorizer:
+      Events:
+        CustomAuthorizer:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-             Path: /customAuthorizer
-             Method: get
+            Path: /customAuthorizer
+            Method: get
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
