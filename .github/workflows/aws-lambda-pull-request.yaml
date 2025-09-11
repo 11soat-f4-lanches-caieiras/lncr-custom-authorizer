@@ -31,12 +31,6 @@ jobs:
         #--parameter-overrides ImageName=${IMAGE_NAME} ImageTag=${IMAGE_TAG}
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-  deploy:
-    needs: build
-    runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
 
       - name: SAM Deploy # Deploy da aplicacao Lambda usando SAM
         run: |
