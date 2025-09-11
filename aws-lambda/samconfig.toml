@@ -1,8 +1,8 @@
 # More information about the configuration file can be found here:
 # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
-[default.global.parameters]
-stack_name = "lncr-stack"
+#[default.global.parameters]
+#stack_name = "lncr-stack"
 
 [default.build.parameters]
 cached = true
