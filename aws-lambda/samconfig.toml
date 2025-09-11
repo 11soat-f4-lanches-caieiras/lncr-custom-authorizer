@@ -1,8 +1,8 @@
 # More information about the configuration file can be found here:
 # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-config.html
 version = 0.1
-#[default.global.parameters]
-#stack_name = "lncr-stack"
+[default.global.parameters]
+stack_name = "lncr-stack"
 
 [default.build.parameters]
 cached = true
@@ -16,9 +16,14 @@ capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = false
 disable_rollback = true
+s3_bucket = "lncr-customer-authorizer-s3"
+region = "us-east-1"
 
 [default.package.parameters]
 resolve_s3 = false
+s3_bucket = "lncr-customer-authorizer-s3"
+region = "us-east-1"
+
 
 [default.sync.parameters]
 watch = true

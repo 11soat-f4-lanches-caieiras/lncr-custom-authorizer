@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Exemplo de stack para criar um bucket S3
+
+Resources:
+  lncr-stack:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: lncr-customer-authorizer-s3
