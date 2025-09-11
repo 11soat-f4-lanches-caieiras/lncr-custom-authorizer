@@ -34,6 +34,6 @@ jobs:
 
       - name: SAM Deploy # Deploy da aplicacao Lambda usando SAM
         run: |
-          sam deploy --debug --template-file .aws-sam/build/template.yaml --stack-name lncr-customer-authorizer --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
+          sam deploy --guided --debug --template-file .aws-sam/build/template.yaml --stack-name lncr-customer-authorizer --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
