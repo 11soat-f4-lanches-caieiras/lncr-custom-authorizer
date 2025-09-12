@@ -45,7 +45,7 @@ jobs:
         run: |
           JAR_WITH_HASH=$(ls $ARTIFACT_PATH* | xargs -n1 basename | sed 's/\.jar$//')-$HASH.jar
           mv $ARTIFACT_PATH*.jar $TARGET_PATH/$JAR_WITH_HASH
-          echo $JAR_WITH_HASH >> $GITHUB_ENV
+          echo "JAR_WITH_HASH=$JAR_WITH_HASH" >> $GITHUB_ENV
         env:
           ARTIFACT_PATH: ${{ env.TARGET_PATH }}/${{env.ARTIFACT_ID}}
           HASH: ${{ env.COMMIT_HASH }}
