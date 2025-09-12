@@ -1,8 +1,0 @@
-{
-  "isAuthorized": true,
-  "context": {
-    "user": "user|a1b2c3d4",
-    "role": "admin"
-  }
-}
-
