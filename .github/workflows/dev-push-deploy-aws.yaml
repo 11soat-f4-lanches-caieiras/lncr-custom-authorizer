@@ -43,7 +43,7 @@ jobs:
 
       - name: Rename jar
         run: |
-          JAR_WITH_HASH=$(ls $ARTIFACT_PATH | xargs -n1 basename)-$HASH.jar
+          JAR_WITH_HASH=$(ls $ARTIFACT_PATH* | xargs -n1 basename)-$HASH.jar
           mv $ARTIFACT_PATH*.jar TARGET_PATH/$JAR_WITH_HASH
           echo $JAR_WITH_HASH >> $GITHUB_ENV
         env:
