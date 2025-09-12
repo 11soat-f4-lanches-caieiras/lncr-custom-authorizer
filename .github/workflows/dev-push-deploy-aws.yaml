@@ -1,4 +1,4 @@
-name: Build lncr-customer authorizer AWS Lambda 
+name: Build and deploy lncr-customer-authorizer AWS Lambda
 on:
   push:
     branches:
@@ -30,8 +30,8 @@ jobs:
 
       - name: Rename jar
         run: |
-          HASH=${git rev-parse --short HEAD}
-          JAR_NAME=${ls target/lncr-custom-authorizer*.jar | xargs -n1 basename | sed 's/\.jar$//'}
+          HASH=$(git rev-parse --short HEAD)
+          JAR_NAME=$(ls target/lncr-custom-authorizer*.jar | xargs -n1 basename | sed 's/\.jar$//')
           JAR_WITH_HASH=$JAR_NAME-$HASH.jar
           mv target/lncr-custom-authorizer-*.jar target/$JAR_WITH_HASH
           echo $JAR_WITH_HASH >> $GITHUB_ENV
