@@ -69,31 +69,22 @@ jobs:
           JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
 
       - name: Export build environment variables as outputs
+        id: export_vars
         run: |
-          echo "::set-output name=APP_PATH=${APP_PATH}" >> $GITHUB_ENV
-          echo "::set-output name=TARGET_PATH=${TARGET_PATH}" >> $GITHUB_ENV
-          echo "::set-output name=COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-          echo "::set-output name=ARTIFACT_ID=${ARTIFACT_ID}" >> $GITHUB_ENV
-          echo "::set-output name=JAR_WITH_HASH=${JAR_WITH_HASH}" >> $GITHUB_ENV
-          echo "::set-output name=AWS_LAMBDA_FUNCTION_NAME=${AWS_LAMBDA_FUNCTION_NAME}" >> $GITHUB_ENV
-        env:
-          APP_PATH: ${{ env.APP_PATH }}
-          TARGET_PATH: ${{ env.TARGET_PATH }}
-          COMMIT_HASH: ${{ env.COMMIT_HASH }}
-          ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
-          JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
-          AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
+          echo "APP_PATH=${{ env.APP_PATH }}" >> $GITHUB_OUTPUT
+          echo "TARGET_PATH=${{ env.TARGET_PATH }}" >> $GITHUB_OUTPUT
+          echo "COMMIT_HASH=${{ env.COMMIT_HASH }}" >> $GITHUB_OUTPUT
+          echo "ARTIFACT_ID=${{ env.ARTIFACT_ID }}" >> $GITHUB_OUTPUT
+          echo "JAR_WITH_HASH=${{ env.JAR_WITH_HASH }}" >> $GITHUB_OUTPUT
+          echo "AWS_LAMBDA_FUNCTION_NAME=${{ env.AWS_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_OUTPUT
+
     outputs:
-      APP_PATH: ${{ env.APP_PATH }}
-      TARGET_PATH: ${{ env.TARGET_PATH }}
-      COMMIT_HASH: ${{ env.COMMIT_HASH }}
-      ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
-      JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
-      AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
-
-
-
-
+      APP_PATH: ${{ steps.export_vars.outputs.APP_PATH }}
+      TARGET_PATH: ${{ steps.export_vars.outputs.TARGET_PATH }}
+      COMMIT_HASH: ${{ steps.export_vars.outputs.COMMIT_HASH }}
+      ARTIFACT_ID: ${{ steps.export_vars.outputs.ARTIFACT_ID }}
+      JAR_WITH_HASH: ${{ steps.export_vars.outputs.JAR_WITH_HASH }}
+      AWS_LAMBDA_FUNCTION_NAME: ${{ steps.export_vars.outputs.AWS_LAMBDA_FUNCTION_NAME }}
 
   deploy:
     needs: build
@@ -120,9 +111,3 @@ jobs:
           environment-variables: |
             LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
-        env:
-          AWS_LAMBDA_FUNCTION_NAME: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
-          TARGET_PATH: ${{ needs.build.outputs.TARGET_PATH }}
-          JAR_WITH_HASH: ${{ needs.build.outputs.JAR_WITH_HASH }}
-          ENVIRONMENT: ${{ job.environment }}
-          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
