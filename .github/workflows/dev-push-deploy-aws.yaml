@@ -19,6 +19,7 @@ jobs:
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
             echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
             echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+            echo "AWS_LAMBDA_FUNCTION_NAME=lncr-custom-authorizer" >> $GITHUB_ENV
             
 
       - name: Setup Java 21
