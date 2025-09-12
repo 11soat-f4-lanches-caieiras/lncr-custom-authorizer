@@ -102,23 +102,23 @@ jobs:
       dev
     steps:
       - name: Download JAR Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
-          path: ${{ needs.build.outputs.TARGET_PATH }}/${{ needs.build.outputs.JAR_WITH_HASH }}
+          path: ${{ needs.build.outputs.TARGET_PATH }}
 
       - name: Deploy to AWS Lambda
         uses: aws-actions/aws-lambda-deploy@v1
         with:
-          function-name: $AWS_LAMBDA_FUNCTION_NAME-$ENVIRONMENT
-          zip-file: $TARGET_PATH/$JAR_WITH_HASH
+          function-name: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}-${{ job.environment }}
+          zip-file: ${{ needs.build.outputs.TARGET_PATH }}/${{ needs.build.outputs.JAR_WITH_HASH }}
           handler: br.com.tp.lncr.aws.lambda.CustomAuthorizer::handleRequest
           runtime: java21
           architecture: arm64
           memory-size: 1024
           timeout: 30
           environment-variables: |
-            LNCR_OAUTH_SECRET_KEY=$LNCR_OAUTH_SECRET_KEY
+            LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
         env:
           AWS_LAMBDA_FUNCTION_NAME: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
