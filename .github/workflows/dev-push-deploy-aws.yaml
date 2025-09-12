@@ -68,6 +68,32 @@ jobs:
           AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
           JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
 
+      - name: Export build environment variables as outputs
+        run: |
+          echo "::set-output name=APP_PATH=${APP_PATH}" >> $GITHUB_ENV
+          echo "::set-output name=TARGET_PATH=${TARGET_PATH}" >> $GITHUB_ENV
+          echo "::set-output name=COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+          echo "::set-output name=ARTIFACT_ID=${ARTIFACT_ID}" >> $GITHUB_ENV
+          echo "::set-output name=JAR_WITH_HASH=${JAR_WITH_HASH}" >> $GITHUB_ENV
+          echo "::set-output name=AWS_LAMBDA_FUNCTION_NAME=${AWS_LAMBDA_FUNCTION_NAME}" >> $GITHUB_ENV
+        env:
+          APP_PATH: ${{ env.APP_PATH }}
+          TARGET_PATH: ${{ env.TARGET_PATH }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
+          ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
+          JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
+          AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
+    outputs:
+      APP_PATH: ${{ env.APP_PATH }}
+      TARGET_PATH: ${{ env.TARGET_PATH }}
+      COMMIT_HASH: ${{ env.COMMIT_HASH }}
+      ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
+      JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
+      AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
+
+
+
+
 
   deploy:
     needs: build
@@ -78,15 +104,25 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
-          path: ${{ env.TARGET_PATH }}
+          name: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
+          path: ${{ needs.build.outputs.TARGET_PATH }}/${{ needs.build.outputs.JAR_WITH_HASH }}
 
       - name: Deploy to AWS Lambda
-        uses: aws-actions/aws-lambda-deploy@v1
+        uses: aws-actions/aws-lambda-deploy@v5
         with:
-          function-name: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}-${{job.environment}}
-          zip-file: ${{ env.TARGET_PATH}}/${{ env.JAR_WITH_HASH }}
-
-
-
-
+          function-name: $AWS_LAMBDA_FUNCTION_NAME-$ENVIRONMENT
+          zip-file: $TARGET_PATH/$JAR_WITH_HASH
+          handler: br.com.tp.lncr.aws.lambda.CustomAuthorizer::handleRequest
+          runtime: java21
+          architecture: arm64
+          memory-size: 1024
+          timeout: 30
+          environment-variables: |
+            LNCR_OAUTH_SECRET_KEY=$LNCR_OAUTH_SECRET_KEY
+          description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
+        env:
+          AWS_LAMBDA_FUNCTION_NAME: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
+          TARGET_PATH: ${{ needs.build.outputs.TARGET_PATH }}
+          JAR_WITH_HASH: ${{ needs.build.outputs.JAR_WITH_HASH }}
+          ENVIRONMENT: ${{ job.environment }}
+          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
