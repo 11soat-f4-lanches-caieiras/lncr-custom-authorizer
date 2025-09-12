@@ -27,12 +27,19 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'maven'
+
+      - name: Get ArtifactId
+        run: |
+
+          ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+
+        env:
+          APP_PATH: ${{ env.APP_PATH }}
+          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
       
       - name: Build with maven
         run: |
-          
-          ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
-          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
           
           cd $APP_PATH
           mvn clean package test
@@ -54,10 +61,9 @@ jobs:
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lncr-custom-authorizer
-          path: target/$JAR_WITH_HASH
-        env:
-          JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
+          name: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
+          path: ${{ env.TARGET_PATH}}/${{ env.JAR_WITH_HASH }}
+
 
   deploy:
     needs: build
@@ -68,16 +74,15 @@ jobs:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v4
         with:
-          name: lncr-custom-authorizer
-          path: ./aws-lambda/CustomAuthorizer/target
+          name: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
+          path: ${{ env.TARGET_PATH }}
 
       - name: Deploy to AWS Lambda
         uses: aws-actions/aws-lambda-deploy@v1
         with:
           function-name: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}-${{job.environment}}
-          zip-file: ./aws-lambda/CustomAuthorizer/target/${{ env.JAR_WITH_HASH }}
-        env:
-          JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
+          zip-file: ${{ env.TARGET_PATH}}/${{ env.JAR_WITH_HASH }}
+
 
 
 
