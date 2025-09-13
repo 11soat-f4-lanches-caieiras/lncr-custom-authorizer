@@ -104,7 +104,7 @@ jobs:
         with:
           function-name: ${{ vars.LNCR_FUNCTION_NAME }}
           zip-file: ${{ needs.build.outputs.TARGET_PATH }}/${{ needs.build.outputs.JAR_WITH_HASH }}
-          handler: ${{ secrets.LNCR_FUNCTION_HANDLER }}
+          handler: ${{ vars.LNCR_FUNCTION_HANDLER }}
           environment-variables: |
             LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
