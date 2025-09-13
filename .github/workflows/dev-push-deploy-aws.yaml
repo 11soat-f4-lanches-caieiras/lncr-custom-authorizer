@@ -2,13 +2,17 @@ name: Build and deploy lncr-customer-authorizer AWS Lambda
 on:
   push:
     branches:
-      - develop 
+      - develop
+  pull_request:
+    branches:
+      - master
+    types: [closed]
 
 jobs:
   build:
     runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
-      dev
+      name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
@@ -19,8 +23,6 @@ jobs:
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
             echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
             echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-            echo "AWS_LAMBDA_FUNCTION_NAME=lncr-custom-authorizer" >> $GITHUB_ENV
-            
 
       - name: Setup Java 21
         uses: actions/setup-java@v5
@@ -29,44 +31,43 @@ jobs:
           java-version: 21
           cache: 'maven'
 
-      - name: Get ArtifactId
+      - name: Get ArtifactId and Version
         run: |
-
           ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+          VERSION=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
-
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
         env:
           APP_PATH: ${{ env.APP_PATH }}
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-      
+
       - name: Build with maven
         run: |
-          
           cd $APP_PATH
           mvn clean package test
-
         env:
           APP_PATH: ${{ env.APP_PATH }}
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
       - name: Rename jar
         run: |
-          JAR_WITH_HASH=$(ls $ARTIFACT_PATH* | xargs -n1 basename | sed 's/\.jar$//')-$HASH.jar
-          mv $ARTIFACT_PATH*.jar $TARGET_PATH/$JAR_WITH_HASH
+          JAR_ORIG=$(ls $TARGET_PATH/${{ env.ARTIFACT_ID }}*.jar | head -n 1)
+          JAR_WITH_HASH="${{ env.ARTIFACT_ID }}-${{ env.VERSION }}-${{ env.COMMIT_HASH }}.jar"
+          mv $JAR_ORIG $TARGET_PATH/$JAR_WITH_HASH
           echo "JAR_WITH_HASH=$JAR_WITH_HASH" >> $GITHUB_ENV
         env:
-          ARTIFACT_PATH: ${{ env.TARGET_PATH }}/${{env.ARTIFACT_ID}}
-          HASH: ${{ env.COMMIT_HASH }}
           TARGET_PATH: ${{ env.TARGET_PATH }}
+          ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
+          VERSION: ${{ env.VERSION }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
 
       - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: $AWS_LAMBDA_FUNCTION_NAME
-          path: $TARGET_PATH/$JAR_WITH_HASH
+          name: build-jar
+          path: ${{ env.TARGET_PATH }}/${{ env.JAR_WITH_HASH }}
         env:
           TARGET_PATH: ${{ env.TARGET_PATH }}
-          AWS_LAMBDA_FUNCTION_NAME: ${{ env.AWS_LAMBDA_FUNCTION_NAME }}
           JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
 
       - name: Export build environment variables as outputs
@@ -76,39 +77,34 @@ jobs:
           echo "TARGET_PATH=${{ env.TARGET_PATH }}" >> $GITHUB_OUTPUT
           echo "COMMIT_HASH=${{ env.COMMIT_HASH }}" >> $GITHUB_OUTPUT
           echo "ARTIFACT_ID=${{ env.ARTIFACT_ID }}" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ env.VERSION }}" >> $GITHUB_OUTPUT
           echo "JAR_WITH_HASH=${{ env.JAR_WITH_HASH }}" >> $GITHUB_OUTPUT
-          echo "AWS_LAMBDA_FUNCTION_NAME=${{ env.AWS_LAMBDA_FUNCTION_NAME }}" >> $GITHUB_OUTPUT
-
     outputs:
       APP_PATH: ${{ steps.export_vars.outputs.APP_PATH }}
       TARGET_PATH: ${{ steps.export_vars.outputs.TARGET_PATH }}
       COMMIT_HASH: ${{ steps.export_vars.outputs.COMMIT_HASH }}
       ARTIFACT_ID: ${{ steps.export_vars.outputs.ARTIFACT_ID }}
+      VERSION: ${{ steps.export_vars.outputs.VERSION }}
       JAR_WITH_HASH: ${{ steps.export_vars.outputs.JAR_WITH_HASH }}
-      AWS_LAMBDA_FUNCTION_NAME: ${{ steps.export_vars.outputs.AWS_LAMBDA_FUNCTION_NAME }}
 
   deploy:
     needs: build
     runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
-      dev
+      name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
       - name: Download JAR Artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}
+          name: build-jar
           path: ${{ needs.build.outputs.TARGET_PATH }}
 
       - name: Deploy to AWS Lambda
         uses: aws-actions/aws-lambda-deploy@v1
         with:
-          function-name: ${{ needs.build.outputs.AWS_LAMBDA_FUNCTION_NAME }}-${{ job.environment }}
+          function-name: ${{ secrets.LNCR_FUNCTION_NAME }}
           zip-file: ${{ needs.build.outputs.TARGET_PATH }}/${{ needs.build.outputs.JAR_WITH_HASH }}
-          handler: br.com.tp.lncr.aws.lambda.CustomAuthorizer::handleRequest
-          runtime: java21
-          architecture: arm64
-          memory-size: 1024
-          timeout: 30
+          handler: ${{ secrets.LNCR_FUNCTION_HANDLER }}
           environment-variables: |
             LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
