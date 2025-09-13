@@ -97,13 +97,13 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: build-jar
-          path: ${{ needs.build.outputs.TARGET_PATH }}
+          path: ./artifacts
 
       - name: Deploy to AWS Lambda
         uses: aws-actions/aws-lambda-deploy@v1
         with:
           function-name: ${{ vars.LNCR_FUNCTION_NAME }}
-          code-artifacts-dir: ${{ needs.build.outputs.TARGET_PATH }}
+          code-artifacts-dir: ./artifacts
           zip-file: ${{ needs.build.outputs.JAR_WITH_HASH }}
           handler: ${{ vars.LNCR_FUNCTION_HANDLER }}
           runtime: java21
