@@ -100,13 +100,26 @@ jobs:
           path: ./artifacts
 
       - name: Deploy to AWS Lambda
-        uses: aws-actions/aws-lambda-deploy@v1
-        with:
-          function-name: ${{ vars.LNCR_FUNCTION_NAME }}
-          code-artifacts-dir: ./artifacts
-          zip-file: ${{ needs.build.outputs.JAR_WITH_HASH }}
-          handler: ${{ vars.LNCR_FUNCTION_HANDLER }}
-          runtime: java21
-          environment-variables: |
-            LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-          description: "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
+        run: |
+          # Atualizar código da função
+          aws lambda update-function-code \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }} \
+            --zip-file fileb://./artifacts/${{ needs.build.outputs.JAR_WITH_HASH }}
+          
+          # Aguardar a atualização do código ser completada
+          aws lambda wait function-updated \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }}
+          
+          # Atualizar configuração da função (handler, runtime e variáveis de ambiente)
+          aws lambda update-function-configuration \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }} \
+            --handler ${{ vars.LNCR_FUNCTION_HANDLER }} \
+            --runtime java21 \
+            --environment Variables="{LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}}" \
+            --description "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
+          
+          # Aguardar a atualização da configuração ser completada
+          aws lambda wait function-updated \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }}
+          
+          echo "Deploy realizado com sucesso!"
