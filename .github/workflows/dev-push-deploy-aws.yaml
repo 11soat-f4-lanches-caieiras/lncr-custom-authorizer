@@ -9,7 +9,8 @@ on:
     types: [closed]
 
 jobs:
-  build:
+  build-customer:
+    name: Build Customer Authorizer Lambda Function
     runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
@@ -88,6 +89,7 @@ jobs:
       JAR_WITH_HASH: ${{ steps.export_vars.outputs.JAR_WITH_HASH }}
 
   deploy:
+    name: Deploy to AWS Lambda Function
     needs: build
     runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
