@@ -2,6 +2,7 @@ package br.com.tp.lncr.aws.lambda;
 
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
 import br.com.tp.lncr.aws.lambda.utils.AuthorizatedUtils;
+import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import com.amazonaws.services.lambda.runtime.events.SimpleIAMPolicyResponse;
@@ -133,7 +134,7 @@ public class CustomAuthorizerTest {
 
     private String createValidTestToken(String scope) {
         try {
-            String secretKey = System.getenv("LNCR_OAUTH_SECRET_KEY");
+            String secretKey = SecretUtils.getSecretValue();
             if (secretKey == null || secretKey.trim().isEmpty()) {
                 secretKey = "mysecretkey";
             }
