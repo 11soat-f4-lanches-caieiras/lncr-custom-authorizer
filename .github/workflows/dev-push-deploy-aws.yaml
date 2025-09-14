@@ -9,7 +9,7 @@ on:
     types: [closed]
 
 jobs:
-  build-customer:
+  build:
     name: Build Customer Authorizer Lambda Function
     runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
