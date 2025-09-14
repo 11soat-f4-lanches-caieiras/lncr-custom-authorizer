@@ -117,7 +117,7 @@ jobs:
             --function-name ${{ vars.LNCR_FUNCTION_NAME }} \
             --handler ${{ vars.LNCR_FUNCTION_HANDLER }} \
             --runtime java21 \
-            --environment Variables="{LNCR_OAUTH_SECRET_KEY=${{ secrets.LNCR_OAUTH_SECRET_KEY }}}" \
+            --environment Variables="{LNCR_AWS_SECRET_KEY=${{ vars.LNCR_AWS_SECRET_KEY }},LNCR_AWS_SECRET_NAME=${{ vars.LNCR_AWS_SECRET_NAME}}}" \
             --description "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
           
           # Aguardar a atualização da configuração ser completada
