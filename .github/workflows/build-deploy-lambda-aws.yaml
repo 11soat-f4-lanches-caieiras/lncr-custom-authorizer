@@ -124,7 +124,7 @@ jobs:
           aws lambda wait function-updated \
             --function-name ${{ vars.LNCR_FUNCTION_NAME }}
           
-          echo "Deploy realizado com sucesso!"
+          echo "Deploy realizado com sucesso!!"
 
       - name: Create/Update Oauth SecretKey in AWS Secrets Manager
         run: |
