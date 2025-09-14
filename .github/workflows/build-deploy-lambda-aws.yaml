@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build Customer Authorizer Lambda Function
-    runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
     if: github.event.pull_request.merged == true || github.event_name == 'push'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
@@ -92,8 +92,7 @@ jobs:
   deploy:
     name: Deploy to AWS Lambda Function
     needs: build
-    runs-on: codebuild-lncr-codebuild-project-github-${{ github.run_id }}-${{ github.run_attempt }}
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
