@@ -125,3 +125,22 @@ jobs:
             --function-name ${{ vars.LNCR_FUNCTION_NAME }}
           
           echo "Deploy realizado com sucesso!"
+
+      - name: Create/Update Oauth SecretKey in AWS Secrets Manager
+        run: |
+          LNCR_AWS_SECRET_KEY="${{ vars.LNCR_AWS_SECRET_KEY }}"
+          LNCR_AWS_SECRET_VALUE="${{ secrets.LNCR_OAUTH_SECRET_KEY }}"
+          SECRET_JSON="{\"LNCR_AWS_SECRET_KEY\":\"LNCR_AWS_SECRET_VALUE\"}"
+          
+          if aws secretsmanager describe-secret --secret-id ${{ vars.LNCR_AWS_SECRET_NAME }} ; then
+            echo "Secret ${{ vars.LNCR_AWS_SECRET_NAME }} existe, atualizando valor."
+            aws secretsmanager update-secret \
+              --secret-id ${{ vars.LNCR_AWS_SECRET_NAME }} \
+              --secret-string "$SECRET_JSON"
+          else
+            echo "Secret ${{ vars.LNCR_AWS_SECRET_NAME }} não existe. Criando secret."
+            aws secretsmanager create-secret \
+            --name ${{ vars.LNCR_AWS_SECRET_NAME }} \
+            --description "SecretKey para geração e validação de token" \
+            --secret-string "$SECRET_JSON" 
+          fi

@@ -1,6 +1,7 @@
 package br.com.tp.lncr.aws.lambda.model;
 
 import br.com.tp.lncr.aws.lambda.utils.TokenDecoderUtils;
+import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class TokenClaims {
     public String subject;
@@ -11,12 +12,14 @@ public class TokenClaims {
             throw new IllegalArgumentException("Token is null or empty");
         }
 
-        if (TokenDecoderUtils.isTokenExpired(token)) {
+        DecodedJWT tokenDecoded = TokenDecoderUtils.decodeToken(token);
+
+        if (TokenDecoderUtils.isTokenExpired(tokenDecoded)) {
             throw new IllegalArgumentException("Token is expired");
         }
 
-        this.subject = TokenDecoderUtils.getSubject(token);
-        this.scope = TokenDecoderUtils.getScope(token);
+        this.subject = TokenDecoderUtils.getSubject(tokenDecoded);
+        this.scope = TokenDecoderUtils.getScope(tokenDecoded);
 
     }
 
