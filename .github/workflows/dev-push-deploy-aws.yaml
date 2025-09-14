@@ -130,7 +130,7 @@ jobs:
         run: |
           LNCR_AWS_SECRET_KEY="${{ vars.LNCR_AWS_SECRET_KEY }}"
           LNCR_AWS_SECRET_VALUE="${{ secrets.LNCR_OAUTH_SECRET_KEY }}"
-          SECRET_JSON="{\"LNCR_AWS_SECRET_KEY\":\"LNCR_AWS_SECRET_VALUE\"}"
+          SECRET_JSON="{\"$LNCR_AWS_SECRET_KEY\":\"$LNCR_AWS_SECRET_VALUE\"}"
           
           if aws secretsmanager describe-secret --secret-id ${{ vars.LNCR_AWS_SECRET_NAME }} ; then
             echo "Secret ${{ vars.LNCR_AWS_SECRET_NAME }} existe, atualizando valor."
