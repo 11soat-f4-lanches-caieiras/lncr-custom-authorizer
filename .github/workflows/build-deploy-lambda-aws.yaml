@@ -48,10 +48,10 @@ jobs:
 
       - name: Build with maven
         run: |
+          mvn -f $GITHUB_WORKSPACE/lncr-core/core/pom.xml clean install -DskipTests
           cd $APP_PATH
           mvn clean package test
         env:
-          APP_PATH: ${{ env.APP_PATH }}
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
