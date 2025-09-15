@@ -1,8 +1,8 @@
 package br.com.tp.lncr.aws.lambda;
 
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
-import br.com.tp.lncr.aws.lambda.utils.AuthorizatedUtils;
-import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
+import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
+import br.com.tp.lncr.core.commons.utils.security.SecretUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import com.amazonaws.services.lambda.runtime.events.SimpleIAMPolicyResponse;
@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.TokenUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ public class CustomAuthorizerTest {
     private APIGatewayV2CustomAuthorizerEvent input;
     private CustomAuthorizer customAuthorizer;
     private final Context mockContext = null;
+    private final String secretKey = SecretUtils.getSecretValue();;
 
     @BeforeEach
     public void setUp() {
@@ -134,10 +136,6 @@ public class CustomAuthorizerTest {
 
     private String createValidTestToken(String scope) {
         try {
-            String secretKey = SecretUtils.getSecretValue();
-            if (secretKey == null || secretKey.trim().isEmpty()) {
-                secretKey = "mysecretkey";
-            }
             Algorithm algorithm = Algorithm.HMAC256(secretKey);
             return com.auth0.jwt.JWT.create()
                     .withSubject("lncr-token")

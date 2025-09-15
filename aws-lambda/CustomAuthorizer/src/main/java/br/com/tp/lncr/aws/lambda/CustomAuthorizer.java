@@ -2,7 +2,7 @@ package br.com.tp.lncr.aws.lambda;
 
 import br.com.tp.lncr.aws.lambda.model.RequestDTO;
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
-import br.com.tp.lncr.aws.lambda.utils.AuthorizatedUtils;
+import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.*;

@@ -1,6 +1,6 @@
 package br.com.tp.lncr.aws.lambda.model;
 
-import br.com.tp.lncr.aws.lambda.utils.TokenDecoderUtils;
+import br.com.tp.lncr.core.commons.utils.security.TokenDecoderUtils;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class TokenClaims {

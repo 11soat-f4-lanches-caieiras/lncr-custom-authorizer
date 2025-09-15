@@ -32,6 +32,9 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'maven'
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
 
       - name: Get ArtifactId and Version
         run: |
@@ -50,6 +53,8 @@ jobs:
         env:
           APP_PATH: ${{ env.APP_PATH }}
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rename jar
         run: |
