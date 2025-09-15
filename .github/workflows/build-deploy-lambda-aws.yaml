@@ -69,7 +69,6 @@ jobs:
 
       - name: Build with maven
         run: |
-          mvn -f $GITHUB_WORKSPACE/lncr-core/core/pom.xml clean install -DskipTests
           cd $APP_PATH
           mvn clean package test
         env:
