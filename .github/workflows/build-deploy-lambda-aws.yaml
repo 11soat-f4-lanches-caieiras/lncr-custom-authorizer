@@ -36,6 +36,27 @@ jobs:
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
 
+      - name: Configurar Maven para GitHub Packages
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'EOF'
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${env.GITHUB_ACTOR}</username>
+                <password>${env.GITHUB_TOKEN}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
       - name: Get ArtifactId and Version
         run: |
           ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
@@ -115,7 +136,7 @@ jobs:
             --zip-file fileb://./artifacts/${{ needs.build.outputs.JAR_WITH_HASH }}
           
           # Aguardar a atualização do código ser completada
-          aws lambda wait function-updated \
+            aws lambda wait function-updated \
             --function-name ${{ vars.LNCR_FUNCTION_NAME }}
           
           # Atualizar configuração da função (handler, runtime e variáveis de ambiente)
