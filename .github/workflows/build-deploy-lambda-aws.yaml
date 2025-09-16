@@ -8,8 +8,8 @@ on:
       - master
     types: [closed]
 permissions:
-  contents: write
-  packages: write
+  contents: read
+  packages: read
   actions: read
 
 jobs:

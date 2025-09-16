@@ -15,6 +15,7 @@
             <repositories>
                 <repository>
                     <id>github</id>
+                    <name>Dependencia lncr-core Github Packages</name>
                     <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/lncr-core</url>
                     <snapshots>
                         <enabled>true</enabled>
