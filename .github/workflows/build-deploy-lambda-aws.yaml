@@ -38,9 +38,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: 'maven'
-          server-id: github
-          server-username: GITHUB_ACTOR
-          server-password: GITHUB_TOKEN
+
 
       - name: Configurar Maven para GitHub Packages
         run: |
@@ -48,10 +46,9 @@ jobs:
             cp $SETTINGS_PATH ~/.m2/settings.xml
 
         env:
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
           SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
+
 
       - name: Get ArtifactId and Version
         run: |
@@ -67,12 +64,12 @@ jobs:
         run: |
           cd $APP_PATH
           cat ~/.m2/settings.xml
-          mvn clean package test -s ~/.m2/settings.xml -X
+          mvn clean package test -s ~/.m2/settings.xml
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-          GITHUB_ACTOR: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
+          LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
+          LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
 
       - name: Rename jar
         run: |

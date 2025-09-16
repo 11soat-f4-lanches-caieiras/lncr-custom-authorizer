@@ -5,29 +5,8 @@
     <servers>
         <server>
             <id>github</id>
-            <username>${env.GITHUB_ACTOR}</username>
-            <password>${env.GITHUB_TOKEN}</password>
+            <username>${LNCR_MAVEN_ACTOR}</username>
+            <password>${LNCR_MAVEN_PAT}</password>
         </server>
     </servers>
-    <profiles>
-        <profile>
-            <id>github</id>
-            <repositories>
-                <repository>
-                    <id>github</id>
-                    <name>Dependencia lncr-core Github Packages</name>
-                    <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/lncr-core</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <updatePolicy>always</updatePolicy>
-                    </releases>
-                </repository>
-            </repositories>
-        </profile>
-    </profiles>
-    <activeProfiles>
-        <activeProfile>github</activeProfile>
-    </activeProfiles>
 </settings>
