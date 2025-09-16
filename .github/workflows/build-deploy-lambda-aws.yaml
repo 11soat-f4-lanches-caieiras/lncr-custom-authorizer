@@ -7,6 +7,10 @@ on:
     branches:
       - master
     types: [closed]
+permissions:
+  contents: write
+  packages: write
+  actions: read
 
 jobs:
   build:
