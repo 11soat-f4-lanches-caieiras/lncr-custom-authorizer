@@ -66,11 +66,13 @@ jobs:
       - name: Build with maven
         run: |
           cd $APP_PATH
-          mvn clean package test
+          cat ~/.m2/settings.xml
+          mvn clean package test -s ~/.m2/settings.xml -X
         env:
           LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
 
       - name: Rename jar
         run: |
