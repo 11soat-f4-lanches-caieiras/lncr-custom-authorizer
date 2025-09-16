@@ -15,7 +15,7 @@
             <repositories>
                 <repository>
                     <id>github</id>
-                    <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/*</url>
+                    <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/lncr-core</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
