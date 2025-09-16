@@ -6,6 +6,16 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <description>Authorizer Function do Api Gateway</description>
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/lncr-core</url>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </distributionManagement>
     <repositories>
         <repository>
             <id>github</id>
