@@ -8,9 +8,9 @@ on:
       - master
     types: [closed]
 permissions:
-  contents: read
-  packages: read
-  actions: read
+  contents: write
+  packages: write
+  actions: write
 
 jobs:
   build:
@@ -70,6 +70,8 @@ jobs:
           SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
           LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
           LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rename jar
         run: |
