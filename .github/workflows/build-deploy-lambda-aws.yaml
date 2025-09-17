@@ -7,6 +7,26 @@ on:
     branches:
       - master
     types: [closed]
+
+  workflow_dispatch:
+      inputs:
+        environment:
+          description: 'Ambiente para deploy'
+          required: true
+          default: 'dev'
+          type: choice
+          options:
+            - dev
+            - prd
+        branch:
+          description: 'Branch para build'
+          required: true
+          default: 'develop'
+          type: choice
+          options:
+            - develop
+            - master
+
 permissions:
   contents: write
   packages: write
