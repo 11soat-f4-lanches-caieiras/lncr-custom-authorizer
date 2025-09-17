@@ -22,10 +22,7 @@ on:
           description: 'Branch para build'
           required: true
           default: 'develop'
-          type: choice
-          options:
-            - develop
-            - master
+          type: string
 
 permissions:
   contents: write
