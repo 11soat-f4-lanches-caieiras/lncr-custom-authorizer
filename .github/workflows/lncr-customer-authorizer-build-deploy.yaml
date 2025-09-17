@@ -1,31 +1,23 @@
-name: Construir e Deploy do lncr-customer-authorizer AWS Lambda
+name: Build and deploy lncr-customer-authorizer AWS Lambda
 on:
   push:
     branches:
       - develop
-    paths:
-      - '/aws-lambda/CustomAuthorizer/**'
   pull_request:
     branches:
       - master
-    paths:
-      - '/aws-lambda/CustomAuthorizer/**'
     types: [closed]
 
   workflow_dispatch:
-
-env:
-  # variáveis
-    LNCR_FUNCTION_NAME: ${{ vars.LNCR_FUNCTION_NAME }}
-    LNCR_FUNCTION_HANDLER: ${{ vars.LNCR_FUNCTION_HANDLER }}
-    LNCR_AWS_SECRET_KEY: ${{ vars.LNCR_AWS_SECRET_KEY }}
-    LNCR_AWS_SECRET_NAME: ${{ vars.LNCR_AWS_SECRET_NAME }}
-
-    # secrets
-    LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
-    LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
-    LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
-
+      inputs:
+        environment:
+          description: 'Ambiente para deploy'
+          required: true
+          default: 'dev'
+          type: choice
+          options:
+            - dev
+            - prd
 permissions:
   contents: write
   packages: write
@@ -33,69 +25,68 @@ permissions:
 
 jobs:
   build:
-    name: Construir Função Lambda Customer Authorizer
+    name: Build Customer Authorizer Lambda Function
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
     if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
-      - name: Fazer checkout do código
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
 
-      - name: Definir Caminhos e Variáveis de Ambiente
+      - name: Set Paths and Env Variables
         run: |
-            echo "Compondo variáveis de ambiente..."
-          
             APP_PATH=$PWD/aws-lambda/CustomAuthorizer
-            SETTINGS_PATH=$APP_PATH/maven_settings.xml
-          
-            echo "Exportando variáveis de ambiente..."
+            SETTINGS_PATH=$PWD/.github/workflows/settings.xml
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
             echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
             echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
             echo "SETTINGS_PATH=$SETTINGS_PATH" >> $GITHUB_ENV
 
-      - name: Configurar Java 21
-        uses: actions/setup-java@v4
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: 21
           cache: 'maven'
 
-      - name: Obter ArtifactId e Versão
+
+      - name: Configurar Maven para GitHub Packages
         run: |
-          echo "Obtendo ArtifactId e Version do pom.xml..."
+            mkdir -p ~/.m2
+            cp $SETTINGS_PATH ~/.m2/settings.xml
+
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
+
+
+      - name: Get ArtifactId and Version
+        run: |
           ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           VERSION=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
-          
-          echo "Exportando variáveis de ambiente..."
           echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
         env:
           APP_PATH: ${{ env.APP_PATH }}
-          LNCR_OAUTH_SECRET_KEY: ${{ env.LNCR_OAUTH_SECRET_KEY }}
+          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
-      - name: Construir com Maven
+      - name: Build with maven
         run: |
-          
           cd $APP_PATH
-          mvn clean package test -s $SETTINGS_PATH
-
+          cat ~/.m2/settings.xml
+          mvn clean package test -s ~/.m2/settings.xml
         env:
-
+          LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
           SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
-          LNCR_MAVEN_PAT: ${{ env.LNCR_MAVEN_PAT }}
-          LNCR_MAVEN_ACTOR: ${{ env.LNCR_MAVEN_ACTOR }}
+          LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
+          LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
 
-      - name: Renomear JAR
+      - name: Rename jar
         run: |
-          echo "Renomeando JAR com hash do commit..."
           JAR_ORIG=$(ls $TARGET_PATH/${{ env.ARTIFACT_ID }}*.jar | head -n 1)
           JAR_WITH_HASH="${{ env.ARTIFACT_ID }}-${{ env.VERSION }}-${{ env.COMMIT_HASH }}.jar"
           mv $JAR_ORIG $TARGET_PATH/$JAR_WITH_HASH
-          
-          echo "Exportando variáveis de ambiente..."
           echo "JAR_WITH_HASH=$JAR_WITH_HASH" >> $GITHUB_ENV
         env:
           TARGET_PATH: ${{ env.TARGET_PATH }}
@@ -103,7 +94,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
           COMMIT_HASH: ${{ env.COMMIT_HASH }}
 
-      - name: Upload do Artefato JAR
+      - name: Upload JAR Artifact
         uses: actions/upload-artifact@v4
         with:
           name: build-jar
@@ -112,10 +103,9 @@ jobs:
           TARGET_PATH: ${{ env.TARGET_PATH }}
           JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
 
-      - name: Exportar variáveis de ambiente de build como outputs
+      - name: Export build environment variables as outputs
         id: export_vars
         run: |
-          echo "Exportando variáveis de ambiente de build como outputs..."
           echo "APP_PATH=${{ env.APP_PATH }}" >> $GITHUB_OUTPUT
           echo "TARGET_PATH=${{ env.TARGET_PATH }}" >> $GITHUB_OUTPUT
           echo "COMMIT_HASH=${{ env.COMMIT_HASH }}" >> $GITHUB_OUTPUT
@@ -131,59 +121,59 @@ jobs:
       JAR_WITH_HASH: ${{ steps.export_vars.outputs.JAR_WITH_HASH }}
 
   deploy:
-    name: Deploy para Função AWS Lambda
+    name: Deploy to AWS Lambda Function
     needs: build
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
     if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
-      - name: Download do Artefato JAR
-        uses: actions/download-artifact@v4
+      - name: Download JAR Artifact
+        uses: actions/download-artifact@v5
         with:
           name: build-jar
           path: ./artifacts
 
-      - name: Deploy para AWS Lambda
+      - name: Deploy to AWS Lambda
         run: |
           # Atualizar código da função
           aws lambda update-function-code \
-            --function-name ${{ env.LNCR_FUNCTION_NAME }} \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }} \
             --zip-file fileb://./artifacts/${{ needs.build.outputs.JAR_WITH_HASH }}
           
           # Aguardar a atualização do código ser completada
             aws lambda wait function-updated \
-            --function-name ${{ env.LNCR_FUNCTION_NAME }}
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }}
           
           # Atualizar configuração da função (handler, runtime e variáveis de ambiente)
           aws lambda update-function-configuration \
-            --function-name ${{ env.LNCR_FUNCTION_NAME }} \
-            --handler ${{ env.LNCR_FUNCTION_HANDLER }} \
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }} \
+            --handler ${{ vars.LNCR_FUNCTION_HANDLER }} \
             --runtime java21 \
-            --environment Variables="{LNCR_AWS_SECRET_KEY=${{ env.LNCR_AWS_SECRET_KEY }},LNCR_AWS_SECRET_NAME=${{ env.LNCR_AWS_SECRET_NAME}}}" \
+            --environment Variables="{LNCR_AWS_SECRET_KEY=${{ vars.LNCR_AWS_SECRET_KEY }},LNCR_AWS_SECRET_NAME=${{ vars.LNCR_AWS_SECRET_NAME}}}" \
             --description "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
           
           # Aguardar a atualização da configuração ser completada
           aws lambda wait function-updated \
-            --function-name ${{ env.LNCR_FUNCTION_NAME }}
+            --function-name ${{ vars.LNCR_FUNCTION_NAME }}
           
           echo "Deploy realizado com sucesso!!"
 
-      - name: Criar/Atualizar Oauth SecretKey no AWS Secrets Manager
+      - name: Create/Update Oauth SecretKey in AWS Secrets Manager
         run: |
-          LNCR_AWS_SECRET_KEY="${{ env.LNCR_AWS_SECRET_KEY }}"
-          LNCR_AWS_SECRET_VALUE="${{ env.LNCR_OAUTH_SECRET_KEY }}"
+          LNCR_AWS_SECRET_KEY="${{ vars.LNCR_AWS_SECRET_KEY }}"
+          LNCR_AWS_SECRET_VALUE="${{ secrets.LNCR_OAUTH_SECRET_KEY }}"
           SECRET_JSON="{\"$LNCR_AWS_SECRET_KEY\":\"$LNCR_AWS_SECRET_VALUE\"}"
           
           if aws secretsmanager describe-secret --secret-id ${{ vars.LNCR_AWS_SECRET_NAME }} ; then
-            echo "Secret ${{ env.LNCR_AWS_SECRET_NAME }} existe, atualizando valor."
+            echo "Secret ${{ vars.LNCR_AWS_SECRET_NAME }} existe, atualizando valor."
             aws secretsmanager update-secret \
-              --secret-id ${{ env.LNCR_AWS_SECRET_NAME }} \
+              --secret-id ${{ vars.LNCR_AWS_SECRET_NAME }} \
               --secret-string "$SECRET_JSON"
           else
             echo "Secret ${{ vars.LNCR_AWS_SECRET_NAME }} não existe. Criando secret."
             aws secretsmanager create-secret \
-            --name ${{ env.LNCR_AWS_SECRET_NAME }} \
+            --name ${{ vars.LNCR_AWS_SECRET_NAME }} \
             --description "SecretKey para geração e validação de token" \
             --secret-string "$SECRET_JSON" 
           fi
