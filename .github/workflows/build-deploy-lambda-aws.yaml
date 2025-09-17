@@ -7,16 +7,36 @@ on:
     branches:
       - master
     types: [closed]
+
+  workflow_dispatch:
+      inputs:
+        environment:
+          description: 'Ambiente para deploy'
+          required: true
+          default: 'dev'
+          type: choice
+          options:
+            - dev
+            - prd
+        branch:
+          description: 'Branch para build'
+          required: true
+          default: 'develop'
+          type: choice
+          options:
+            - develop
+            - master
+
 permissions:
-  contents: read
-  packages: read
-  actions: read
+  contents: write
+  packages: write
+  actions: write
 
 jobs:
   build:
     name: Build Customer Authorizer Lambda Function
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
@@ -113,7 +133,7 @@ jobs:
     name: Deploy to AWS Lambda Function
     needs: build
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
-    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
