@@ -5,8 +5,8 @@
     <servers>
         <server>
             <id>github</id>
-            <username>${GITHUB_ACTOR}</username>
-            <password>${GITHUB_TOKEN}</password>
+            <username>${LNCR_MAVEN_ACTOR}</username>
+            <password>${LNCR_MAVEN_PAT}</password>
         </server>
     </servers>
 </settings>
