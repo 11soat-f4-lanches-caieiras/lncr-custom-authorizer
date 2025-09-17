@@ -7,10 +7,6 @@ on:
     branches:
       - master
     types: [closed]
-permissions:
-  contents: read
-  packages: read
-  actions: read
 
   workflow_dispatch:
       inputs:
@@ -22,14 +18,6 @@ permissions:
           options:
             - dev
             - prd
-        branch:
-          description: 'Branch para build'
-          required: true
-          default: 'develop'
-          type: choice
-          options:
-            - develop
-            - master
 
 permissions:
   contents: write
@@ -137,7 +125,7 @@ jobs:
     name: Deploy to AWS Lambda Function
     needs: build
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
-   if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
