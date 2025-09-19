@@ -1,7 +1,16 @@
 name: Build and deploy lncr-customer-authorizer AWS Lambda
 on:
-  repository_dispatch:
-    types: [ infra-base-completed ]
+  push:
+    branches:
+      - develop
+    paths:
+      - '/aws-lambda/CustomAuthorizer/**'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '/aws-lambda/CustomAuthorizer/**'
+    types: [closed]
 
   workflow_dispatch:
 
@@ -26,7 +35,7 @@ jobs:
   build:
     name: Construir Função Lambda Customer Authorizer
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+    if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
@@ -125,7 +134,7 @@ jobs:
     name: Deploy para Função AWS Lambda
     needs: build
     runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
-    if: ${{ github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+    if: github.event.pull_request.merged == true || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
