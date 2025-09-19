@@ -44,12 +44,12 @@ jobs:
 
       - name: Set Paths and Env Variables
         run: |
-            echo "Compondo variáveis de ambiente...\n"
+            echo "Compondo variáveis de ambiente..."
           
             APP_PATH=$PWD/aws-lambda/CustomAuthorizer
             SETTINGS_PATH=$APP_PATH/maven_settings.xml
           
-            echo "\n Exportando variáveis de ambiente...\n"
+            echo " Exportando variáveis de ambiente..."
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
             echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
             echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
@@ -66,11 +66,11 @@ jobs:
 
       - name: Get ArtifactId and Version
         run: |
-          echo "Obtendo ArtifactId e Version do pom.xml...\n"
+          echo "Obtendo ArtifactId e Version do pom.xml..."
           ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
           VERSION=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
           
-          echo "\n Exportando variáveis de ambiente...\n"
+          echo " Exportando variáveis de ambiente..."
           echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
@@ -92,12 +92,12 @@ jobs:
 
       - name: Rename jar
         run: |
-          echo "Renomeando JAR com hash do commit...\n"
+          echo "Renomeando JAR com hash do commit..."
           JAR_ORIG=$(ls $TARGET_PATH/${{ env.ARTIFACT_ID }}*.jar | head -n 1)
           JAR_WITH_HASH="${{ env.ARTIFACT_ID }}-${{ env.VERSION }}-${{ env.COMMIT_HASH }}.jar"
           mv $JAR_ORIG $TARGET_PATH/$JAR_WITH_HASH
           
-          echo "\n Exportando variáveis de ambiente...\n"
+          echo " Exportando variáveis de ambiente..."
           echo "JAR_WITH_HASH=$JAR_WITH_HASH" >> $GITHUB_ENV
         env:
           TARGET_PATH: ${{ env.TARGET_PATH }}
@@ -117,7 +117,7 @@ jobs:
       - name: Export build environment variables as outputs
         id: export_vars
         run: |
-          echo "Exporting build environment variables as outputs...\n"
+          echo "Exporting build environment variables as outputs..."
           echo "APP_PATH=${{ env.APP_PATH }}" >> $GITHUB_OUTPUT
           echo "TARGET_PATH=${{ env.TARGET_PATH }}" >> $GITHUB_OUTPUT
           echo "COMMIT_HASH=${{ env.COMMIT_HASH }}" >> $GITHUB_OUTPUT
