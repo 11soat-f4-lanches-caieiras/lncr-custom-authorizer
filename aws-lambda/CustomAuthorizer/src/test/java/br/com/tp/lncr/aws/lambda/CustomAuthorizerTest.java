@@ -2,7 +2,7 @@ package br.com.tp.lncr.aws.lambda;
 
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
 import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
-import br.com.tp.lncr.core.commons.utils.security.SecretUtils;
+import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import com.amazonaws.services.lambda.runtime.events.SimpleIAMPolicyResponse;
@@ -15,7 +15,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.TokenUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,7 @@ public class CustomAuthorizerTest {
     private APIGatewayV2CustomAuthorizerEvent input;
     private CustomAuthorizer customAuthorizer;
     private final Context mockContext = null;
-    private final String secretKey = SecretUtils.getSecretValue();;
+    private final String secretKey = SecretUtils.getAwsSecretValue();
 
     @BeforeEach
     public void setUp() {

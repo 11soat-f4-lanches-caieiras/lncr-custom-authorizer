@@ -3,6 +3,7 @@ package br.com.tp.lncr.aws.lambda;
 import br.com.tp.lncr.aws.lambda.model.RequestDTO;
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
 import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
+import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.*;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthorizerEvent, SimpleIAMPolicyResponse> {
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizer.class);
+    private static final String SECRET_KEY = SecretUtils.getAwsSecretValue();
 
     public SimpleIAMPolicyResponse handleRequest(final APIGatewayV2CustomAuthorizerEvent input, final Context context) {
         logger.info("Iniciando processo de autorizacao");
@@ -24,7 +26,7 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
             logger.debug("Carregando regras de autorizacao");
             Map<String, Object> allowPathsRules = new AllowResourcesRules().read();
             logger.debug("Processando requisição de autorizacao");
-            RequestDTO requestDTO = new RequestDTO(input);
+            RequestDTO requestDTO = new RequestDTO(input,SECRET_KEY);
 
             logger.info("Verificando autorizacao para - Método: {}, Path: {}, Escopo: {}",
                 requestDTO.getHttpMethod(),
