@@ -47,7 +47,7 @@ jobs:
             echo "Compondo variáveis de ambiente...\n"
           
             APP_PATH=$PWD/aws-lambda/CustomAuthorizer
-            SETTINGS_PATH=$APP_PATH/settings.xml
+            SETTINGS_PATH=$APP_PATH/maven_settings.xml
           
             echo "\n Exportando variáveis de ambiente...\n"
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
