@@ -1,18 +1,15 @@
 name: Build and deploy lncr-customer-authorizer AWS Lambda
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - '/aws-lambda/CustomAuthorizer/**'
-  pull_request:
-    branches:
-      - master
-    paths:
-      - '/aws-lambda/CustomAuthorizer/**'
-    types: [closed]
-
+  repository_dispatch:
+    types: [infra-base-completed]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: false
+        default: 'develop'
+        type: string
 
 env:
   # variáveis
