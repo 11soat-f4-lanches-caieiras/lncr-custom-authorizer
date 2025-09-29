@@ -1,5 +1,6 @@
 package br.com.tp.lncr.aws.lambda.utils;
 
+import br.com.tp.lncr.aws.lambda.CustomAuthorizer;
 import br.com.tp.lncr.core.commons.exceptions.OauthException;
 import br.com.tp.lncr.core.commons.utils.Logger;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,7 +12,7 @@ import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueReques
 
 public class SecretUtils {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SecretUtils.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(SecretUtils.class);
     private static final String LNCR_AWS_SECRET_KEY = System.getProperty("LNCR_AWS_SECRET_KEY","LNCR_OAUTH_SECRET_KEY");
     private static final String LNCR_AWS_SECRET_NAME = System.getProperty("LNCR_AWS_SECRET_NAME","lncr-prd-sm");
     private static final String LNCR_AWS_REGION = "us-east-1";
@@ -20,7 +21,7 @@ public class SecretUtils {
 
     public static String getAwsSecretValue(){
         String localSecretKey = System.getenv(LNCR_AWS_SECRET_KEY);
-        log.info("localSecretKey: {}", localSecretKey);
+        logger.info("localSecretKey: {}", localSecretKey);
         try {
             if (localSecretKey == null || localSecretKey.isEmpty()) {
                 Logger.info("Fetching secret key from AWS Secrets Manager");
@@ -41,7 +42,7 @@ public class SecretUtils {
 
     private static String mapSecretValue(String secretString) {
         try {
-            log.info("secretString: {}", secretString);
+            //logger.info("secretString: {}", secretString);
             JsonNode node = new ObjectMapper().readTree(secretString);
             return node.get(LNCR_AWS_SECRET_KEY).asText();
         } catch (Exception e) {
