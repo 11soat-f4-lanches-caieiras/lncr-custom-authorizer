@@ -19,13 +19,15 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
 
     public SimpleIAMPolicyResponse handleRequest(final APIGatewayV2CustomAuthorizerEvent input, final Context context) {
         logger.info("Iniciando processo de autorizacao");
+        logger.info("input: {}", input.toString());
+
         Map<String, String> contextResponse = new HashMap<>();
         Boolean isAuthorized = false;
 
         try {
-            logger.debug("Carregando regras de autorizacao");
+            logger.info("Carregando regras de autorizacao");
             Map<String, Object> allowPathsRules = new AllowResourcesRules().read();
-            logger.debug("Processando requisição de autorizacao");
+            logger.info("Processando requisição de autorizacao");
             RequestDTO requestDTO = new RequestDTO(input,SECRET_KEY);
 
             logger.info("Verificando autorizacao para - Método: {}, Path: {}, Escopo: {}",
@@ -43,12 +45,15 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
             contextResponse.put("resource", requestDTO.getResource());
             contextResponse.put("httpMethod", requestDTO.getHttpMethod());
             contextResponse.put("scope", requestDTO.getTokenClaims().getScope());
-            return new SimpleIAMPolicyResponse(isAuthorized, contextResponse);
+            SimpleIAMPolicyResponse response = new SimpleIAMPolicyResponse(isAuthorized, contextResponse);
+            logger.info("Resposta de autorizacao gerada: {}", response);
+            return response;
 
         } catch (Exception e) {
             logger.error("Erro durante o processo de autorizacao", e);
-            contextResponse.put("message", e.getMessage());
-            return new SimpleIAMPolicyResponse(isAuthorized, contextResponse);
+            SimpleIAMPolicyResponse response = new SimpleIAMPolicyResponse(isAuthorized, contextResponse);
+            logger.info("Resposta de autorizacao gerada: {}", response);
+            return response;
         }
     }
 
