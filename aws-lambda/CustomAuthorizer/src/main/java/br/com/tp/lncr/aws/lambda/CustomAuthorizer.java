@@ -19,7 +19,7 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
 
     public SimpleIAMPolicyResponse handleRequest(final APIGatewayV2CustomAuthorizerEvent input, final Context context) {
         logger.info("Iniciando processo de autorizacao");
-        logger.info("input: {}", input.toString());
+        printInput(input);
 
         Map<String, String> contextResponse = new HashMap<>();
         Boolean isAuthorized = false;
@@ -55,6 +55,96 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
             logger.info("Resposta de autorizacao gerada: {}", response);
             return response;
         }
+    }
+
+    public static void printInput(APIGatewayV2CustomAuthorizerEvent input) {
+        logger.info("=== APIGatewayV2CustomAuthorizerEvent Attributes ===");
+
+        if (input == null) {
+            logger.info("Input event is null");
+            return;
+        }
+
+        // Basic request information
+        logger.info("Type: {}", input.getType());
+        logger.info("Version: {}", input.getVersion());
+        logger.info("Route Key: {}", input.getRouteKey());
+        logger.info("Raw Path: {}", input.getRawPath());
+        logger.info("Raw Query String: {}", input.getRawQueryString());
+
+        // Cookies
+        if (input.getCookies() != null && !input.getCookies().isEmpty()) {
+            logger.info("Cookies: {}", input.getCookies());
+        } else {
+            logger.info("Cookies: none");
+        }
+
+        // Headers
+        if (input.getHeaders() != null && !input.getHeaders().isEmpty()) {
+            logger.info("Headers:");
+            input.getHeaders().forEach((key, value) ->
+                logger.info("  {}: {}", key, value));
+        } else {
+            logger.info("Headers: none");
+        }
+
+        // Query String Parameters
+        if (input.getQueryStringParameters() != null && !input.getQueryStringParameters().isEmpty()) {
+            logger.info("Query String Parameters:");
+            input.getQueryStringParameters().forEach((key, value) ->
+                logger.info("  {}: {}", key, value));
+        } else {
+            logger.info("Query String Parameters: none");
+        }
+
+        // Path Parameters
+        if (input.getPathParameters() != null && !input.getPathParameters().isEmpty()) {
+            logger.info("Path Parameters:");
+            input.getPathParameters().forEach((key, value) ->
+                logger.info("  {}: {}", key, value));
+        } else {
+            logger.info("Path Parameters: none");
+        }
+
+        // Stage Variables
+        if (input.getStageVariables() != null && !input.getStageVariables().isEmpty()) {
+            logger.info("Stage Variables:");
+            input.getStageVariables().forEach((key, value) ->
+                logger.info("  {}: {}", key, value));
+        } else {
+            logger.info("Stage Variables: none");
+        }
+
+        // Request Context
+        if (input.getRequestContext() != null) {
+            APIGatewayV2CustomAuthorizerEvent.RequestContext context = input.getRequestContext();
+            logger.info("Request Context:");
+            logger.info("  Account ID: {}", context.getAccountId());
+            logger.info("  API ID: {}", context.getApiId());
+            logger.info("  Domain Name: {}", context.getDomainName());
+            logger.info("  Domain Prefix: {}", context.getDomainPrefix());
+            logger.info("  Request ID: {}", context.getRequestId());
+            logger.info("  Route Key: {}", context.getRouteKey());
+            logger.info("  Stage: {}", context.getStage());
+
+            // HTTP Context
+            if (context.getHttp() != null) {
+                logger.info("  HTTP Context: {}", context.getHttp());
+            } else {
+                logger.info("  HTTP Context: null");
+            }
+        } else {
+            logger.info("Request Context: null");
+        }
+
+        // Identity Source
+        if (input.getIdentitySource() != null && !input.getIdentitySource().isEmpty()) {
+            logger.info("Identity Source: {}", input.getIdentitySource());
+        } else {
+            logger.info("Identity Source: none");
+        }
+
+        logger.info("=== End of APIGatewayV2CustomAuthorizerEvent Attributes ===");
     }
 
 }
