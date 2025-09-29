@@ -4,12 +4,6 @@ on:
     types: [ infra-base-completed ]
 
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Branch to deploy'
-        required: false
-        default: 'develop'
-        type: string
 
 env:
   # variáveis
