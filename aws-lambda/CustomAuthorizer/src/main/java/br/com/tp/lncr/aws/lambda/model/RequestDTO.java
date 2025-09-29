@@ -8,12 +8,12 @@ public class RequestDTO {
     private final TokenClaims tokenClaims;
 
     public RequestDTO(APIGatewayV2CustomAuthorizerEvent input, String secretKey) {
-        if (input.getHeaders() == null || !input.getHeaders().containsKey("Authorization")) {
-            throw new IllegalArgumentException("Authorization header is missing");
+        if (input.getHeaders() == null || !input.getHeaders().containsKey("authorization")) {
+            throw new IllegalArgumentException("authorization header is missing");
         }
         this.httpMethod = input.getRequestContext().getHttp().getMethod();
         this.resource = input.getRawPath().replace(httpMethod + " ", "");
-        this.tokenClaims = new TokenClaims(input.getHeaders().get("Authorization").replace("Bearer ", ""), secretKey);
+        this.tokenClaims = new TokenClaims(input.getHeaders().get("authorization").replace("Bearer ", ""), secretKey);
     }
 
     public String getResource() {
