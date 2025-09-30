@@ -13,8 +13,6 @@ env:
     LNCR_AWS_SECRET_NAME: ${{ vars.LNCR_AWS_SECRET_NAME }}
 
     # secrets
-    LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
-    LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
     LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
 
 permissions:
@@ -38,13 +36,11 @@ jobs:
             echo "Compondo variáveis de ambiente..."
           
             APP_PATH=$PWD/aws-lambda/CustomAuthorizer
-            SETTINGS_PATH=$APP_PATH/maven_settings.xml
-          
+
             echo "Exportando variáveis de ambiente..."
             echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
             echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
             echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-            echo "SETTINGS_PATH=$SETTINGS_PATH" >> $GITHUB_ENV
 
       - name: Configurar Java 21
         uses: actions/setup-java@v4
@@ -71,13 +67,11 @@ jobs:
         run: |
           
           cd $APP_PATH
-          mvn clean package test -s $SETTINGS_PATH
+          mvn clean package test
 
         env:
 
           SETTINGS_PATH: ${{ env.SETTINGS_PATH }}
-          LNCR_MAVEN_PAT: ${{ env.LNCR_MAVEN_PAT }}
-          LNCR_MAVEN_ACTOR: ${{ env.LNCR_MAVEN_ACTOR }}
 
       - name: Renomear JAR
         run: |
