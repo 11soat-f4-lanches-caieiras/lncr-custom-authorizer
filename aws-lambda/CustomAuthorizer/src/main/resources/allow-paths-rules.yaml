@@ -3,8 +3,8 @@ customer:
     - "/customers"
     - "/customerOrders"
   GET:
-    - "/customers/{customerId}"
-    - "/customers/documentNumber/{documentNumber}"
+    - "/customer/{customerId}"
+    - "/customer/documentNumber/{documentNumber}"
     - "/customerOrder/{customerOrderId}"
     - "/customerOrders/status/{statusList}"
     - "/foodItems"
@@ -13,11 +13,11 @@ customer:
     - "/foodItems/image/{foodItemImageId}"
     - "/payments/mercadoPago/{customerOrderId}/get"
   PATCH:
-    - "/customers/{customerId}"
-    - "/customers/documentNumber/{documentNumber}"
+    - "/customer/{customerId}"
+    - "/customer/documentNumber/{documentNumber}"
     - "/payments/mercadoPago/{customerOrderId}/cancel"
   DELETE:
-    - "/customers/{customerId}"
+    - "/customer/{customerId}"
   PUT:
     - "/foodItems/image/{foodItemImageId}"
 admin:
@@ -31,9 +31,9 @@ admin:
     - "/webhooks/payments/mercadoPago/callback"
   GET:
     - "/customers"
-    - "/customers/{customerId}"
-    - "/customers/listIds/{customerIdList}"
-    - "/customers/documentNumber/{documentNumber}"
+    - "/customer/{customerId}"
+    - "/customer/listIds/{customerIdList}"
+    - "/customer/documentNumber/{documentNumber}"
     - "/customerOrder/{customerOrderId}"
     - "/customerOrders/status/{statusList}"
     - "/foodItems"
@@ -48,15 +48,15 @@ admin:
     - "/notifications/{notificationType}"
     - "/payments/mercadoPago/{customerOrderId}/get"
   PATCH:
-    - "/customers/{customerId}"
-    - "/customers/documentNumber/{documentNumber}"
+    - "/customer/{customerId}"
+    - "/customer/documentNumber/{documentNumber}"
     - "/customerOrder/{customerOrderId}/updateStatus/{newStatus}"
     - "/foodItems/{foodItemId}"
     - "/kitchenOrders/{kitchenOrderId}/updateStatus/{newStatus}"
     - "/payments/mercadoPago/paymentReceived"
     - "/payments/mercadoPago/{customerOrderId}/cancel"
   DELETE:
-    - "/customers/{customerId}"
+    - "/customer/{customerId}"
     - "/foodItems/{foodItemId}"
     - "/foodItems/{foodItemId}/images"
     - "/foodItems/image/{foodItemImageId}"
@@ -74,7 +74,7 @@ totem:
     - "/foodItems/image/{foodItemImageId}"
     - "/payments/mercadoPago/{customerOrderId}/get"
   PATCH:
-    - "/customers/{customerId}"
+    - "/customer/{customerId}"
 monitor:
   GET:
     - "/customerOrder/{customerOrderId}"

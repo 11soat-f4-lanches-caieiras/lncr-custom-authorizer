@@ -6,6 +6,16 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <description>Authorizer Function do Api Gateway</description>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/11soat-f3-lanches-caieiras/lncr-core</url>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+        </repository>
+    </repositories>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -71,6 +81,11 @@
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
             <version>3.1.12</version>
+        </dependency>
+        <dependency>
+            <groupId>br.com.tp.lncr</groupId>
+            <artifactId>core</artifactId>
+            <version>2.0</version>
         </dependency>
     </dependencies>
     <build>
