@@ -11,11 +11,11 @@ customer:
     - "/foodItems/{foodItemId}"
     - "/foodItems/{foodItemId}/images"
     - "/foodItems/image/{foodItemImageId}"
-    - "/payments/mercadoPago/{customerOrderId}/get"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
   PATCH:
     - "/customers/{customerId}"
     - "/customers/documentNumber/{documentNumber}"
-    - "/payments/mercadoPago/{customerOrderId}/cancel"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/cancel"
   DELETE:
     - "/customers/{customerId}"
   PUT:
