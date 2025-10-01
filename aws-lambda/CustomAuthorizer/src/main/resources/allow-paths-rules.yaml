@@ -54,7 +54,7 @@ admin:
     - "/foodItems/{foodItemId}"
     - "/kitchenOrders/{kitchenOrderId}/updateStatus/{newStatus}"
     - "/payments/mercadoPago/paymentReceived"
-    - "/payments/mercadoPago/{customerOrderId}/cancel"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/cancel"
   DELETE:
     - "/customers/{customerId}"
     - "/foodItems/{foodItemId}"
@@ -72,7 +72,7 @@ totem:
     - "/foodItems/{foodItemId}"
     - "/foodItems/{foodItemId}/images"
     - "/foodItems/image/{foodItemImageId}"
-    - "/payments/mercadoPago/{customerOrderId}/get"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
   PATCH:
     - "/customers/{customerId}"
 monitor:
