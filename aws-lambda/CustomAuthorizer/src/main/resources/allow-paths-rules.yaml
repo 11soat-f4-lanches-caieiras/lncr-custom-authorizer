@@ -46,7 +46,7 @@ admin:
     - "/kitchenOrders/customerOrder/{customerOrderId}"
     - "/notifications/"
     - "/notifications/{notificationType}"
-    - "/payments/mercadoPago/{customerOrderId}/get"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
   PATCH:
     - "/customers/{customerId}"
     - "/customers/documentNumber/{documentNumber}"
