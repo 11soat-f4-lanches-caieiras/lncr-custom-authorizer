@@ -27,7 +27,7 @@ public class RequestDTO {
         }
 
         this.httpMethod = input.getRequestContext().getHttp().getMethod();
-        this.resource = input.getRawPath().replace(httpMethod + " ", "");
+        this.resource = input.getRouteKey().replace(httpMethod + " ", "");
         this.tokenClaims = new TokenClaims(authHeader.replace("Bearer ", ""), secretKey);
     }
 
