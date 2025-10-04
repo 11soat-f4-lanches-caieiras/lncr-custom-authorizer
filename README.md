@@ -19,7 +19,6 @@
    - [Visão Geral do Pipeline](#visão-geral-do-pipeline)
    - [Triggers do Pipeline](#triggers-do-pipeline)
    - [Etapas do Pipeline](#etapas-do-pipeline)
-   - [Ambientes e Estratégia de Deploy](#ambientes-e-estratégia-de-deploy)
    - [Configurações do Pipeline](#configurações-do-pipeline)
    - [Infraestrutura do Pipeline](#infraestrutura-do-pipeline)
    - [Integração com AWS](#integração-com-aws)
@@ -202,13 +201,6 @@ Depende do job Build e executa o deployment
 3. **Gerenciamento de Secrets**
    - Criação/atualização do OAuth Secret no AWS Secrets Manager
    - Configuração automática das chaves de autenticação
-
-### Ambientes e Estratégia de Deploy
-
-| Ambiente | Condição | Runner | Aprovação |
-|----------|----------|---------|-----------|
-| **Development** | `ref_name != 'master'` | CodeBuild | Automática |
-| **Production** | `ref_name == 'master'` | CodeBuild | Environment protection |
 
 ### Configurações do Pipeline
 
