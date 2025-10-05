@@ -9,14 +9,14 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 
 public class SecretUtils {
-
+    
     private static final String LNCR_AWS_SECRET_KEY = System.getProperty("LNCR_AWS_SECRET_KEY","LNCR_OAUTH_SECRET_KEY");
     private static final String LNCR_AWS_SECRET_NAME = System.getProperty("LNCR_AWS_SECRET_NAME","lncr-prd-sm");
     private static final String LNCR_AWS_REGION = "us-east-1";
 
-
     public static String getAwsSecretValue(){
         String localSecretKey = System.getenv(LNCR_AWS_SECRET_KEY);
+        Logger.info("localSecretKey: " + localSecretKey);
         try {
             if (localSecretKey == null || localSecretKey.isEmpty()) {
                 Logger.info("Fetching secret key from AWS Secrets Manager");
