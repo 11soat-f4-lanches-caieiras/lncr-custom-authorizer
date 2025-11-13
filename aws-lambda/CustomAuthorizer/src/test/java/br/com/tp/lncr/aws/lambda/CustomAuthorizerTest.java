@@ -1,8 +1,8 @@
 package br.com.tp.lncr.aws.lambda;
 
+import br.com.tp.lncr.CustomAuthorizer;
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
-import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
-import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
+import br.com.tp.lncr.core.utils.security.AuthorizatedUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayV2CustomAuthorizerEvent;
 import com.amazonaws.services.lambda.runtime.events.SimpleIAMPolicyResponse;
@@ -24,18 +24,20 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class CustomAuthorizerTest {
+class CustomAuthorizerTest {
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizerTest.class);
 
     private Map<String, Object> allowResourcesRules = new HashMap<>();
     private APIGatewayV2CustomAuthorizerEvent input;
     private CustomAuthorizer customAuthorizer;
     private final Context mockContext = null;
-    private final String secretKey = SecretUtils.getAwsSecretValue();
+    private final String secretKey = "test-secret-key-for-unit-tests-minimum-256-bits-long-secret-key-value";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         logger.info("Iniciando configuracao do teste");
+
+        CustomAuthorizer.setSecretKey(secretKey);
         customAuthorizer = new CustomAuthorizer();
         input = new APIGatewayV2CustomAuthorizerEvent();
         allowResourcesRules = new AllowResourcesRules().read();
@@ -45,7 +47,7 @@ public class CustomAuthorizerTest {
     @ParameterizedTest(name = "Teste {index}: Escopo={0}, Método={1}, Path={2}")
     @MethodSource("provideTestArguments")
     @DisplayName("Validação individual de recursos permitidos")
-    public void validateIndividualResource(String scope, String method, String path) {
+    void validateIndividualResource(String scope, String method, String path) {
         logger.info("Executando teste individual - Escopo: {}, Método: {}, Path: {}", scope, method, path);
 
         Boolean expectedResult = AuthorizatedUtils.isAuthorizedResult(allowResourcesRules, scope, method, path);
@@ -82,7 +84,7 @@ public class CustomAuthorizerTest {
 
     @Test
     @DisplayName("Teste de resumo - Validação geral de recursos permitidos")
-    public void validateAllowedsResourceSummary() {
+    void validateAllowedsResourceSummary() {
         logger.info("Iniciando teste de resumo de validacao de recursos permitidos");
 
         List<String> scopes = allowResourcesRules.keySet().stream().toList();

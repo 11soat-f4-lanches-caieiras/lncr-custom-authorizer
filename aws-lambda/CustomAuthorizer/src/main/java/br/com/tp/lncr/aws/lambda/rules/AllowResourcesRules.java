@@ -15,11 +15,11 @@ public class AllowResourcesRules {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         try (InputStream in = AllowResourcesRules.class.getClassLoader().getResourceAsStream("allow-paths-rules.yaml")) {
             if (in == null) {
-                throw new RuntimeException("Arquivo YAML não encontrado");
+                throw new IllegalArgumentException("Arquivo YAML não encontrado");
             }
             return mapper.readValue(in, new TypeReference<>() {});
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao ler o arquivo YAML", e);
+            throw new IllegalArgumentException("Erro ao ler o arquivo YAML", e);
         }
     }
 }

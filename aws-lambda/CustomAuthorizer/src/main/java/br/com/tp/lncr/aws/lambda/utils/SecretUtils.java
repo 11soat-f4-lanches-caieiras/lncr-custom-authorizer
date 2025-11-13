@@ -1,7 +1,7 @@
 package br.com.tp.lncr.aws.lambda.utils;
 
-import br.com.tp.lncr.core.commons.exceptions.OauthException;
-import br.com.tp.lncr.core.commons.utils.Logger;
+import br.com.tp.lncr.core.exceptions.OauthException;
+import br.com.tp.lncr.core.utils.LoggerUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.regions.Region;
@@ -9,17 +9,20 @@ import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
 
 public class SecretUtils {
-    
+
+    private SecretUtils() {
+    }
+
     private static final String LNCR_AWS_SECRET_KEY = System.getProperty("LNCR_AWS_SECRET_KEY","LNCR_OAUTH_SECRET_KEY");
     private static final String LNCR_AWS_SECRET_NAME = System.getProperty("LNCR_AWS_SECRET_NAME","lncr-prd-sm");
     private static final String LNCR_AWS_REGION = "us-east-1";
 
     public static String getAwsSecretValue(){
         String localSecretKey = System.getenv(LNCR_AWS_SECRET_KEY);
-        Logger.info("localSecretKey: " + localSecretKey);
+        LoggerUtil.info("localSecretKey: " + localSecretKey);
         try {
             if (localSecretKey == null || localSecretKey.isEmpty()) {
-                Logger.info("Fetching secret key from AWS Secrets Manager");
+                LoggerUtil.info("Fetching secret key from AWS Secrets Manager");
                 SecretsManagerClient client = SecretsManagerClient.builder()
                         .region(Region.of(LNCR_AWS_REGION))
                         .build();
@@ -28,7 +31,7 @@ public class SecretUtils {
                         .build();
                 return mapSecretValue(client.getSecretValue(request).secretString());
             }
-            Logger.info("Using local secret key from environment variable");
+            LoggerUtil.info("Using local secret key from environment variable");
             return localSecretKey;
         }catch (Exception e) {
             throw new OauthException("Erro ao buscar secret key", 500);
@@ -40,7 +43,7 @@ public class SecretUtils {
             JsonNode node = new ObjectMapper().readTree(secretString);
             return node.get(LNCR_AWS_SECRET_KEY).asText();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to parse secret JSON", e);
+            throw new IllegalArgumentException("Failed to parse secret JSON", e);
 
         }
     }

@@ -6,13 +6,15 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class TokenDecoderUtils {
 
+    private TokenDecoderUtils() {
+    }
+
     private static <T> T getClaimValue(String claim, DecodedJWT decodedJWT, Class<T> tClass) {
         return decodedJWT.getClaim(claim).as(tClass);
     }
 
     public static DecodedJWT decodeToken(String token, String secretKey) {
-        String oauthSecretKey = secretKey;
-        return JWT.require(Algorithm.HMAC256(oauthSecretKey)).build().verify(token);
+        return JWT.require(Algorithm.HMAC256(secretKey)).build().verify(token);
     }
 
 

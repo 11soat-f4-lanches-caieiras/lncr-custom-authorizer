@@ -1,8 +1,8 @@
-package br.com.tp.lncr.aws.lambda;
+package br.com.tp.lncr;
 
 import br.com.tp.lncr.aws.lambda.model.RequestDTO;
 import br.com.tp.lncr.aws.lambda.rules.AllowResourcesRules;
-import br.com.tp.lncr.core.commons.utils.security.AuthorizatedUtils;
+import br.com.tp.lncr.core.utils.security.AuthorizatedUtils;
 import br.com.tp.lncr.aws.lambda.utils.SecretUtils;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
@@ -15,7 +15,24 @@ import java.util.Map;
 
 public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthorizerEvent, SimpleIAMPolicyResponse> {
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizer.class);
-    private static final String SECRET_KEY = SecretUtils.getAwsSecretValue();
+    private static String secretKey;
+
+    public CustomAuthorizer() {
+    }
+
+    /**
+     * Define a secret key manualmente (útil para testes)
+     */
+    public static void setSecretKey(String key) {
+        secretKey = key;
+    }
+
+    private static String getSecretKey() {
+        if (secretKey == null) {
+            secretKey = SecretUtils.getAwsSecretValue();
+        }
+        return secretKey;
+    }
 
     public SimpleIAMPolicyResponse handleRequest(final APIGatewayV2CustomAuthorizerEvent input, final Context context) {
         logger.info("Iniciando processo de autorizacao");
@@ -28,7 +45,7 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
             logger.info("Carregando regras de autorizacao");
             Map<String, Object> allowPathsRules = new AllowResourcesRules().read();
             logger.info("Processando requisição de autorizacao");
-            RequestDTO requestDTO = new RequestDTO(input,SECRET_KEY);
+            RequestDTO requestDTO = new RequestDTO(input, getSecretKey());
 
             logger.info("Verificando autorizacao para - Método: {}, Path: {}, Escopo: {}",
                 requestDTO.getHttpMethod(),
@@ -65,86 +82,61 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
             return;
         }
 
-        // Basic request information
+        printBasicRequestInfo(input);
+        logListOrNone("Cookies", input.getCookies());
+        logMapOrNone("Headers", input.getHeaders());
+        logMapOrNone("Query String Parameters", input.getQueryStringParameters());
+        logMapOrNone("Path Parameters", input.getPathParameters());
+        logMapOrNone("Stage Variables", input.getStageVariables());
+        printRequestContext(input);
+        logListOrNone("Identity Source", input.getIdentitySource());
+
+        logger.info("=== End of APIGatewayV2CustomAuthorizerEvent Attributes ===");
+    }
+
+    private static void printBasicRequestInfo(APIGatewayV2CustomAuthorizerEvent input) {
         logger.info("Type: {}", input.getType());
         logger.info("Version: {}", input.getVersion());
         logger.info("Route Key: {}", input.getRouteKey());
         logger.info("Raw Path: {}", input.getRawPath());
         logger.info("Raw Query String: {}", input.getRawQueryString());
+    }
 
-        // Cookies
-        if (input.getCookies() != null && !input.getCookies().isEmpty()) {
-            logger.info("Cookies: {}", input.getCookies());
+    private static void logListOrNone(String label, java.util.List<?> list) {
+        if (list != null && !list.isEmpty()) {
+            logger.info("{}: {}", label, list);
         } else {
-            logger.info("Cookies: none");
+            logger.info("{}: none", label);
         }
+    }
 
-        // Headers
-        if (input.getHeaders() != null && !input.getHeaders().isEmpty()) {
-            logger.info("Headers:");
-            input.getHeaders().forEach((key, value) ->
-                logger.info("  {}: {}", key, value));
+    private static void logMapOrNone(String label, Map<String, ?> map) {
+        if (map != null && !map.isEmpty()) {
+            logger.info("{}:", label);
+            map.forEach((key, value) -> logger.info("  {}: {}", key, value));
         } else {
-            logger.info("Headers: none");
+            logger.info("{}: none", label);
         }
+    }
 
-        // Query String Parameters
-        if (input.getQueryStringParameters() != null && !input.getQueryStringParameters().isEmpty()) {
-            logger.info("Query String Parameters:");
-            input.getQueryStringParameters().forEach((key, value) ->
-                logger.info("  {}: {}", key, value));
-        } else {
-            logger.info("Query String Parameters: none");
-        }
-
-        // Path Parameters
-        if (input.getPathParameters() != null && !input.getPathParameters().isEmpty()) {
-            logger.info("Path Parameters:");
-            input.getPathParameters().forEach((key, value) ->
-                logger.info("  {}: {}", key, value));
-        } else {
-            logger.info("Path Parameters: none");
-        }
-
-        // Stage Variables
-        if (input.getStageVariables() != null && !input.getStageVariables().isEmpty()) {
-            logger.info("Stage Variables:");
-            input.getStageVariables().forEach((key, value) ->
-                logger.info("  {}: {}", key, value));
-        } else {
-            logger.info("Stage Variables: none");
-        }
-
-        // Request Context
-        if (input.getRequestContext() != null) {
-            APIGatewayV2CustomAuthorizerEvent.RequestContext context = input.getRequestContext();
-            logger.info("Request Context:");
-            logger.info("  Account ID: {}", context.getAccountId());
-            logger.info("  API ID: {}", context.getApiId());
-            logger.info("  Domain Name: {}", context.getDomainName());
-            logger.info("  Domain Prefix: {}", context.getDomainPrefix());
-            logger.info("  Request ID: {}", context.getRequestId());
-            logger.info("  Route Key: {}", context.getRouteKey());
-            logger.info("  Stage: {}", context.getStage());
-
-            // HTTP Context
-            if (context.getHttp() != null) {
-                logger.info("  HTTP Context: {}", context.getHttp());
-            } else {
-                logger.info("  HTTP Context: null");
-            }
-        } else {
+    private static void printRequestContext(APIGatewayV2CustomAuthorizerEvent input) {
+        APIGatewayV2CustomAuthorizerEvent.RequestContext context = input.getRequestContext();
+        if (context == null) {
             logger.info("Request Context: null");
+            return;
         }
 
-        // Identity Source
-        if (input.getIdentitySource() != null && !input.getIdentitySource().isEmpty()) {
-            logger.info("Identity Source: {}", input.getIdentitySource());
-        } else {
-            logger.info("Identity Source: none");
-        }
+        logger.info("Request Context:");
+        logger.info("  Account ID: {}", context.getAccountId());
+        logger.info("  API ID: {}", context.getApiId());
+        logger.info("  Domain Name: {}", context.getDomainName());
+        logger.info("  Domain Prefix: {}", context.getDomainPrefix());
+        logger.info("  Request ID: {}", context.getRequestId());
+        logger.info("  Route Key: {}", context.getRouteKey());
+        logger.info("  Stage: {}", context.getStage());
 
-        logger.info("=== End of APIGatewayV2CustomAuthorizerEvent Attributes ===");
+        String httpContext = context.getHttp() != null ? context.getHttp().toString() : "null";
+        logger.info("  HTTP Context: {}", httpContext);
     }
 
 }
