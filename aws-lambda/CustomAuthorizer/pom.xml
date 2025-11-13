@@ -32,7 +32,6 @@
         <!--suppress UnresolvedMavenProperty -->
         <sonar.token>${SONAR_TOKEN}</sonar.token>
         <sonar.scm.disabled>true</sonar.scm.disabled>
-        <sonar.coverage.exclusions>br.com.tp.lncr.aws.lambda</sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>
             target/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
