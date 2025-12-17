@@ -29,7 +29,7 @@ permissions:
 jobs:
   build:
     name: Construir Função Lambda Customer Authorizer
-    runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: ${{ vars.AWS_CODE_BUILD }}-${{ github.run_id }}-${{ github.run_attempt }}
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
@@ -151,7 +151,7 @@ jobs:
   deploy:
     name: Deploy para Função AWS Lambda
     needs: build
-    runs-on: codebuild-github-lncr-custom-authorizer-${{ github.run_id }}-${{ github.run_attempt }
+    runs-on: ${{ vars.AWS_CODE_BUILD }}-${{ github.run_id }}-${{ github.run_attempt }}
     environment:
       name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
     steps:
