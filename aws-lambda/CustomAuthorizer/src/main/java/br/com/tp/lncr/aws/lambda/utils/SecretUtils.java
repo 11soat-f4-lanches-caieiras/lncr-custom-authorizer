@@ -15,15 +15,14 @@ public class SecretUtils {
     private SecretUtils() {
     }
 
-    private static final String LNCR_LOCAL_SECRET_KEY = System.getProperty("LNCR_LOCAL_SECRET_KEY");
-    private static final String LNCR_AWS_SECRET_KEY = "LNCR_OAUTH_SECRET_KEY";
-    private static final String LNCR_AWS_SECRET_NAME = "lncr-ms-oauth-prd-secrets";
+    private static final String LNCR_AWS_SECRET_KEY = System.getProperty("LNCR_AWS_SECRET_KEY","LNCR_OAUTH_SECRET_KEY");
+    private static final String LNCR_AWS_SECRET_NAME = System.getProperty("LNCR_AWS_SECRET_NAME","lncr-ms-oauth-prd-secrets");
     private static final String LNCR_AWS_REGION = "us-east-1";
 
     public static String getAwsSecretValue(){
         logger.info("LNCR_AWS_SECRET_KEY: {}", LNCR_AWS_SECRET_KEY);
         logger.info("LNCR_AWS_SECRET_NAME: {}", LNCR_AWS_SECRET_NAME);
-        String localSecretKey = System.getenv(LNCR_LOCAL_SECRET_KEY);
+        String localSecretKey = System.getenv(LNCR_AWS_SECRET_KEY);
         logger.info("Checking for local secret key: {}", (localSecretKey != null && !localSecretKey.isEmpty() ? "Found" : "Not found"));
         try {
             if (localSecretKey == null || localSecretKey.isEmpty()) {
