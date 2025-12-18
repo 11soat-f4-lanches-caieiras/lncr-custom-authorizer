@@ -290,7 +290,8 @@ class SecretUtilsTest {
     }
 
     @Test
-    @Tag("local")
+    @Tag("manual")
+    @Disabled("Teste manual - Requer credenciais AWS configuradas e acesso ao Secrets Manager. Execute com: mvn test -Dgroups=manual -Dtest=SecretUtilsTest#shouldHaveReadPermissionOnSecretManager")
     @DisplayName("Teste de permissão de leitura no secret manager")
     void shouldHaveReadPermissionOnSecretManager() {
         System.setProperty("LNCR_AWS_SECRET_KEY", "LNCR_OAUTH_SECRET_KEY");

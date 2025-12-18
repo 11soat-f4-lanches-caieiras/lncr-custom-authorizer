@@ -32,6 +32,9 @@
         <!--suppress UnresolvedMavenProperty -->
         <sonar.token>${SONAR_TOKEN}</sonar.token>
         <sonar.scm.disabled>true</sonar.scm.disabled>
+        <sonar.coverage.exclusions>
+            **/br/com/tp/lncr/aws/lambda/utils/SecretUtils.java
+        </sonar.coverage.exclusions>
         <sonar.coverage.jacoco.xmlReportPaths>
             target/site/jacoco/jacoco.xml
         </sonar.coverage.jacoco.xmlReportPaths>
@@ -156,7 +159,7 @@
               <include>**/*Test.java</include>
               <include>**/AllBddRunner*.java</include>
             </includes>
-              <excludedGroups>local</excludedGroups>
+              <excludedGroups>manual</excludedGroups>
             <systemPropertyVariables>
               <cucumber.junit-platform.naming-strategy>long</cucumber.junit-platform.naming-strategy>
             </systemPropertyVariables>
@@ -203,6 +206,14 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <configuration>
+                            <excludedGroups>manual</excludedGroups>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
                         <version>0.8.11</version>
@@ -230,6 +241,7 @@
                                 <exclude>sun/*</exclude>
                                 <exclude>com/sun/*</exclude>
                                 <exclude>jdk/*</exclude>
+                                <exclude>**/SecretUtils.class</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
