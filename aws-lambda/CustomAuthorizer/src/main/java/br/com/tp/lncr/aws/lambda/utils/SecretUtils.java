@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
@@ -30,7 +29,6 @@ public class SecretUtils {
                 logger.info("Fetching secret key from AWS Secrets Manager");
                 SecretsManagerClient client = SecretsManagerClient.builder()
                         .region(Region.of(LNCR_AWS_REGION))
-                        .credentialsProvider(DefaultCredentialsProvider.create())
                         .build();
                 GetSecretValueRequest request = GetSecretValueRequest.builder()
                         .secretId(LNCR_AWS_SECRET_NAME)
