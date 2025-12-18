@@ -288,5 +288,17 @@ class SecretUtilsTest {
         assertTrue(java.lang.reflect.Modifier.isStatic(method.getModifiers()));
         assertEquals(String.class, method.getReturnType());
     }
+
+    @Test
+    @Tag("local")
+    @DisplayName("Teste de permissão de leitura no secret manager")
+    void shouldHaveReadPermissionOnSecretManager() {
+        System.setProperty("LNCR_AWS_SECRET_KEY", "LNCR_OAUTH_SECRET_KEY");
+        System.setProperty("LNCR_AWS_SECRET_NAME", "lncr-ms-oauth-prd-secrets");
+        String awsSecret = SecretUtils.getAwsSecretValue();
+        assertNotNull(awsSecret);
+        assertFalse(awsSecret.isEmpty());
+    }
+
 }
 
