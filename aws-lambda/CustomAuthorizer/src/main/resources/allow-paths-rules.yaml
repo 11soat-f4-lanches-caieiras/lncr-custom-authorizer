@@ -1,0 +1,91 @@
+customer:
+  POST:
+    - "/customers"
+    - "/customerOrders"
+  GET:
+    - "/customers/{customerId}"
+    - "/customers/documentNumber/{documentNumber}"
+    - "/customerOrder/{customerOrderId}"
+    - "/customerOrders/status/{statusList}"
+    - "/foodItems"
+    - "/foodItems/{foodItemId}"
+    - "/foodItems/{foodItemId}/images"
+    - "/foodItems/image/{foodItemImageId}"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
+  PATCH:
+    - "/customers/{customerId}"
+    - "/customers/documentNumber/{documentNumber}"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/cancel"
+  DELETE:
+    - "/customers/{customerId}"
+  PUT:
+    - "/foodItems/image/{foodItemImageId}"
+admin:
+  POST:
+    - "/customers"
+    - "/customerOrders"
+    - "/foodItems"
+    - "/foodItems/{foodItemId}/images"
+    - "/kitchenOrders"
+    - "/payments/mercadoPago/charge"
+    - "/webhooks/payments/mercadoPago/callback"
+  GET:
+    - "/customers"
+    - "/customers/{customerId}"
+    - "/customers/listIds/{customerIdList}"
+    - "/customers/documentNumber/{documentNumber}"
+    - "/customerOrder/{customerOrderId}"
+    - "/customerOrders/status/{statusList}"
+    - "/foodItems"
+    - "/foodItems/{foodItemId}"
+    - "/foodItems/{foodItemId}/images"
+    - "/foodItems/image/{foodItemImageId}"
+    - "/kitchenOrders"
+    - "/kitchenOrders/{kitchenOrderId}"
+    - "/kitchenOrders/status/{statusList}"
+    - "/kitchenOrders/customerOrder/{customerOrderId}"
+    - "/notifications/"
+    - "/notifications/{notificationType}"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
+  PATCH:
+    - "/customers/{customerId}"
+    - "/customers/documentNumber/{documentNumber}"
+    - "/customerOrder/{customerOrderId}/updateStatus/{newStatus}"
+    - "/foodItems/{foodItemId}"
+    - "/kitchenOrders/{kitchenOrderId}/updateStatus/{newStatus}"
+    - "/payments/mercadoPago/paymentReceived"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/cancel"
+  DELETE:
+    - "/customers/{customerId}"
+    - "/foodItems/{foodItemId}"
+    - "/foodItems/{foodItemId}/images"
+    - "/foodItems/image/{foodItemImageId}"
+  PUT:
+    - "/foodItems/image/{foodItemImageId}"
+totem:
+  POST:
+    - "/customers"
+    - "/customerOrders"
+  GET:
+    - "/customerOrder/{customerOrderId}"
+    - "/foodItems"
+    - "/foodItems/{foodItemId}"
+    - "/foodItems/{foodItemId}/images"
+    - "/foodItems/image/{foodItemImageId}"
+    - "/payments/mercadoPago/customerOrder/{customerOrderId}/get"
+  PATCH:
+    - "/customers/{customerId}"
+monitor:
+  GET:
+    - "/customerOrder/{customerOrderId}"
+    - "/customerOrders/status/{statusList}"
+    - "/kitchenOrders"
+    - "/kitchenOrders/{kitchenOrderId}"
+    - "/kitchenOrders/status/{statusList}"
+    - "/kitchenOrders/customerOrder/{customerOrderId}"
+    - "/notifications/"
+    - "/notifications/{notificationType}"
+  PATCH:
+    - "/customerOrder/{customerOrderId}/updateStatus/{newStatus}"
+    - "/kitchenOrders/{kitchenOrderId}/updateStatus/{newStatus}"
+

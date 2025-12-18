@@ -1,0 +1,189 @@
+name: Build and deploy lncr-customer-authorizer AWS Lambda
+on:
+  repository_dispatch:
+    types: [ infra-base-completed ]
+
+  workflow_dispatch:
+    
+env:
+  # variáveis
+    MAVEN_POM_PATH: "aws-lambda/CustomAuthorizer/pom.xml"
+    MAVEN_SETTINGS_PATH: "aws-lambda/maven_settings.xml"
+    MAVEN_TEMPLATE_URL: ${{ vars.MAVEN_TEMPLATE_URL }}
+    LNCR_FUNCTION_NAME: ${{ vars.LNCR_FUNCTION_NAME }}
+    LNCR_FUNCTION_HANDLER: ${{ vars.LNCR_FUNCTION_HANDLER }}
+    LNCR_AWS_SECRET_KEY: ${{ vars.LNCR_AWS_SECRET_KEY }}
+    LNCR_AWS_SECRET_NAME: ${{ vars.LNCR_AWS_SECRET_NAME }}
+
+    # secrets
+    LNCR_MAVEN_ACTOR: ${{ secrets.LNCR_MAVEN_ACTOR }}
+    LNCR_MAVEN_PAT: ${{ secrets.LNCR_MAVEN_PAT }}
+    LNCR_OAUTH_SECRET_KEY: ${{ secrets.LNCR_OAUTH_SECRET_KEY }}
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+permissions:
+  contents: write
+  packages: write
+  actions: write
+
+jobs:
+  build:
+    name: Construir Função Lambda Customer Authorizer
+    runs-on: ${{ vars.AWS_CODE_BUILD }}-${{ github.run_id }}-${{ github.run_attempt }}
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+    environment:
+      name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
+    steps:
+      - name: Fazer checkout do código
+        uses: actions/checkout@v4
+
+      - name: Definir Caminhos e Variáveis de Ambiente
+        run: |
+            echo "Compondo variáveis de ambiente..."
+          
+            APP_PATH=$PWD/aws-lambda/CustomAuthorizer
+            SETTINGS_PATH=$APP_PATH/maven_settings.xml
+          
+            echo "Exportando variáveis de ambiente..."
+            echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+            echo "TARGET_PATH=$APP_PATH/target" >> $GITHUB_ENV
+            echo "COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+            echo "SETTINGS_PATH=$SETTINGS_PATH" >> $GITHUB_ENV
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          cache: 'maven'
+
+      - name: Configurar Maven
+        env:
+          MAVEN_TEMPLATE_URL: ${{ env.MAVEN_TEMPLATE_URL }}
+          MAVEN_SETTINGS_PATH: ${{ env.MAVEN_SETTINGS_PATH }}
+          LNCR_MAVEN_PAT: ${{ env.LNCR_MAVEN_PAT }}
+        run: |
+          BIN=$PWD
+          echo "Obtendo template do maven_settings.xml"
+          curl -s -H "Authorization: token ${LNCR_MAVEN_PAT}" -o $BIN/$MAVEN_SETTINGS_PATH "${MAVEN_TEMPLATE_URL}" 
+
+      - name: Obter ArtifactId e Versão
+        run: |
+          echo "Obtendo ArtifactId e Version do pom.xml..."
+          ARTIFACT_ID=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
+          VERSION=$(mvn -f $APP_PATH/pom.xml help:evaluate -Dexpression=project.version -q -DforceStdout)
+          
+          echo "Exportando variáveis de ambiente..."
+          echo "ARTIFACT_ID=$ARTIFACT_ID" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+        env:
+          APP_PATH: ${{ env.APP_PATH }}
+          LNCR_OAUTH_SECRET_KEY: ${{ env.LNCR_OAUTH_SECRET_KEY }}
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Análise SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          MAVEN_SETTINGS_PATH: ${{ env.MAVEN_SETTINGS_PATH }}
+          MAVEN_POM_PATH: ${{ env.MAVEN_POM_PATH }}
+        run: |
+          mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -s ${MAVEN_SETTINGS_PATH} \
+          -f ${MAVEN_POM_PATH} \
+          -Pcoverage
+
+      - name: Renomear JAR
+        run: |
+          echo "Renomeando JAR com hash do commit..."
+          JAR_ORIG=$(ls $TARGET_PATH/${{ env.ARTIFACT_ID }}*.jar | head -n 1)
+          JAR_WITH_HASH="${{ env.ARTIFACT_ID }}-${{ env.VERSION }}-${{ env.COMMIT_HASH }}.jar"
+          mv $JAR_ORIG $TARGET_PATH/$JAR_WITH_HASH
+          
+          echo "Exportando variáveis de ambiente..."
+          echo "JAR_WITH_HASH=$JAR_WITH_HASH" >> $GITHUB_ENV
+        env:
+          TARGET_PATH: ${{ env.TARGET_PATH }}
+          ARTIFACT_ID: ${{ env.ARTIFACT_ID }}
+          VERSION: ${{ env.VERSION }}
+          COMMIT_HASH: ${{ env.COMMIT_HASH }}
+
+      - name: Upload do Artefato JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-jar
+          path: ${{ env.TARGET_PATH }}/${{ env.JAR_WITH_HASH }}
+        env:
+          TARGET_PATH: ${{ env.TARGET_PATH }}
+          JAR_WITH_HASH: ${{ env.JAR_WITH_HASH }}
+
+      - name: Exportar variáveis de ambiente de build como outputs
+        id: export_vars
+        run: |
+          echo "Exportando variáveis de ambiente de build como outputs..."
+          echo "APP_PATH=${{ env.APP_PATH }}" >> $GITHUB_OUTPUT
+          echo "TARGET_PATH=${{ env.TARGET_PATH }}" >> $GITHUB_OUTPUT
+          echo "COMMIT_HASH=${{ env.COMMIT_HASH }}" >> $GITHUB_OUTPUT
+          echo "ARTIFACT_ID=${{ env.ARTIFACT_ID }}" >> $GITHUB_OUTPUT
+          echo "VERSION=${{ env.VERSION }}" >> $GITHUB_OUTPUT
+          echo "JAR_WITH_HASH=${{ env.JAR_WITH_HASH }}" >> $GITHUB_OUTPUT
+    outputs:
+      APP_PATH: ${{ steps.export_vars.outputs.APP_PATH }}
+      TARGET_PATH: ${{ steps.export_vars.outputs.TARGET_PATH }}
+      COMMIT_HASH: ${{ steps.export_vars.outputs.COMMIT_HASH }}
+      ARTIFACT_ID: ${{ steps.export_vars.outputs.ARTIFACT_ID }}
+      VERSION: ${{ steps.export_vars.outputs.VERSION }}
+      JAR_WITH_HASH: ${{ steps.export_vars.outputs.JAR_WITH_HASH }}
+
+  deploy:
+    name: Deploy para Função AWS Lambda
+    needs: build
+    runs-on: ${{ vars.AWS_CODE_BUILD }}-${{ github.run_id }}-${{ github.run_attempt }}
+    environment:
+      name: ${{ github.ref_name == 'master' && 'prd' || 'dev' }}
+    steps:
+      - name: Download do Artefato JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: build-jar
+          path: ./artifacts
+
+      - name: Deploy para AWS Lambda
+        run: |
+          # Atualizar código da função
+          aws lambda update-function-code \
+            --function-name ${{ env.LNCR_FUNCTION_NAME }} \
+            --zip-file fileb://./artifacts/${{ needs.build.outputs.JAR_WITH_HASH }}
+
+          # Aguardar a atualização do código ser completada
+            aws lambda wait function-updated \
+            --function-name ${{ env.LNCR_FUNCTION_NAME }}
+
+          # Atualizar configuração da função (handler, runtime e variáveis de ambiente)
+          aws lambda update-function-configuration \
+            --function-name ${{ env.LNCR_FUNCTION_NAME }} \
+            --handler ${{ env.LNCR_FUNCTION_HANDLER }} \
+            --runtime java21 \
+            --environment Variables="{LNCR_AWS_SECRET_KEY=${{ env.LNCR_AWS_SECRET_KEY }},LNCR_AWS_SECRET_NAME=${{ env.LNCR_AWS_SECRET_NAME}}}" \
+            --description "Deploy automático do lncr-customer-authorizer - commit ${{ needs.build.outputs.COMMIT_HASH }}"
+
+          # Aguardar a atualização da configuração ser completada
+          aws lambda wait function-updated \
+            --function-name ${{ env.LNCR_FUNCTION_NAME }}
+
+          echo "Deploy realizado com sucesso!!"
+
+      

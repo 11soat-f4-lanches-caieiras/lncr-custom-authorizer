@@ -1,0 +1,36 @@
+package br.com.tp.lncr.aws.lambda.model;
+
+import br.com.tp.lncr.aws.lambda.utils.TokenDecoderUtils;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
+public class TokenClaims {
+    public String subject;
+    public String scope;
+
+    public TokenClaims(String token, String secretKey) {
+        if (token == null || token.isEmpty()) {
+            throw new IllegalArgumentException("Token is null or empty");
+        }
+
+        DecodedJWT tokenDecoded = TokenDecoderUtils.decodeToken(token, secretKey);
+
+        if (TokenDecoderUtils.isTokenExpired(tokenDecoded)) {
+            throw new IllegalArgumentException("Token is expired");
+        }
+
+        this.subject = TokenDecoderUtils.getSubject(tokenDecoded);
+        this.scope = TokenDecoderUtils.getScope(tokenDecoded);
+
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+
+
+}
