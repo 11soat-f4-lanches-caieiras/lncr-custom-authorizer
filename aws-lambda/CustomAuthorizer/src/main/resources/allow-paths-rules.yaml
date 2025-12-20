@@ -5,7 +5,7 @@ customer:
   GET:
     - "/customers/{customerId}"
     - "/customers/documentNumber/{documentNumber}"
-    - "/customerOrder/{customerOrderId}"
+    - "/customerOrders/{customerOrderId}"
     - "/customerOrders/status/{statusList}"
     - "/foodItems"
     - "/foodItems/{foodItemId}"
@@ -34,7 +34,7 @@ admin:
     - "/customers/{customerId}"
     - "/customers/listIds/{customerIdList}"
     - "/customers/documentNumber/{documentNumber}"
-    - "/customerOrder/{customerOrderId}"
+    - "/customerOrders/{customerOrderId}"
     - "/customerOrders/status/{statusList}"
     - "/foodItems"
     - "/foodItems/{foodItemId}"
