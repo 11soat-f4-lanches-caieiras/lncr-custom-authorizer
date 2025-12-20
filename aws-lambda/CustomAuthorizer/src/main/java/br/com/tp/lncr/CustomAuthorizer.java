@@ -18,6 +18,9 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
     private static String secretKey;
 
     public CustomAuthorizer() {
+        /**
+         * Construtor padrão
+         */
     }
 
     /**
@@ -39,7 +42,7 @@ public class CustomAuthorizer implements RequestHandler<APIGatewayV2CustomAuthor
         printInput(input);
 
         Map<String, String> contextResponse = new HashMap<>();
-        Boolean isAuthorized = false;
+        boolean isAuthorized = false;
 
         try {
             logger.info("Carregando regras de autorizacao");
