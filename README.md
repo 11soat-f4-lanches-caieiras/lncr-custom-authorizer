@@ -5,17 +5,18 @@
 1. [Descrição](#descrição)
 2. [Funcionalidades](#funcionalidades)
 3. [Arquitetura](#arquitetura)
-4. [Tecnologias Utilizadas](#tecnologias-utilizadas)
-5. [Configuração](#configuração)
+4. [Sonar Quality Gate](#sonar-quality-gate)
+5. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+6. [Configuração](#configuração)
    - [Variáveis de Ambiente](#variáveis-de-ambiente)
    - [AWS Secrets Manager](#aws-secrets-manager)
    - [Regras de Autorização](#regras-de-autorização)
-6. [Escopos de Usuário](#escopos-de-usuário)
+7. [Escopos de Usuário](#escopos-de-usuário)
    - [Customer (Cliente)](#customer-cliente)
    - [Admin (Administrador)](#admin-administrador)
    - [Totem (Terminal de Autoatendimento)](#totem-terminal-de-autoatendimento)
    - [Monitor (Sistema de Monitoramento)](#monitor-sistema-de-monitoramento)
-7. [Pipeline de CI/CD](#pipeline-de-cicd)
+8. [Pipeline de CI/CD](#pipeline-de-cicd)
    - [Visão Geral do Pipeline](#visão-geral-do-pipeline)
    - [Triggers do Pipeline](#triggers-do-pipeline)
    - [Etapas do Pipeline](#etapas-do-pipeline)
@@ -23,7 +24,7 @@
    - [Infraestrutura do Pipeline](#infraestrutura-do-pipeline)
    - [Integração com AWS](#integração-com-aws)
    - [Benefícios do Pipeline Automatizado](#benefícios-do-pipeline-automatizado)
-8. [Build e Deploy](#build-e-deploy)
+9. [Build e Deploy](#build-e-deploy)
    - [Pré-requisitos](#pré-requisitos)
    - [Build Local](#build-local)
    - [Executar Testes](#executar-testes)
@@ -58,6 +59,12 @@ IAM Policy Response (Allow/Deny)
        ↓
 lncr-app (EKS) 
 ```
+
+## Sonar Quality Gate
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=11soat-f4-lanches-caieiras_lncr-custom-authorizer&metric=alert_status)](https://sonarcloud.io/project/overview?id=11soat-f4-lanches-caieiras_lncr-custom-authorizer)
+
+Acesse o dashboard completo: [SonarCloud - lncr-custom-authorizer](https://sonarcloud.io/project/overview?id=11soat-f4-lanches-caieiras_lncr-custom-authorizer)
 
 ## Tecnologias Utilizadas
 
