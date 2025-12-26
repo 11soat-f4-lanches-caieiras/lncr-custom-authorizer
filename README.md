@@ -62,7 +62,7 @@ lncr-app (EKS)
 
 ## Sonar Quality Gate
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=11soat-f4-lanches-caieiras_lncr-custom-authorizer&metric=alert_status)](https://sonarcloud.io/project/overview?id=11soat-f4-lanches-caieiras_lncr-custom-authorizer)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=11soat-f4-lanches-caieiras_lncr-custom-authorizer&metric=alert_status&token=f3119e65b6d0749ec05af7abef29cd2daaae04cd)](https://sonarcloud.io/summary/new_code?id=11soat-f4-lanches-caieiras_lncr-custom-authorizer)
 
 Acesse o dashboard completo: [SonarCloud - lncr-custom-authorizer](https://sonarcloud.io/project/overview?id=11soat-f4-lanches-caieiras_lncr-custom-authorizer)
 
